@@ -1,0 +1,3464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZapToolsCanvas | Developer Utilities & Document Tools</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root {
+      --color-dark: #0F172A;
+      --color-primary: #2563EB;
+      --color-accent: #10B981;
+      --color-bg: #F8FAFC;
+      --color-surface: #FFFFFF;
+      --color-border: #E2E8F0;
+      --color-muted: #64748B;
+      
+      --font-body: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'Space Mono', monospace;
+      
+      --header-height: 72px;
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.08);
+      --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+      --shadow-lg: 0 12px 24px -4px rgba(15, 23, 42, 0.12);
+    }
+
+    /* Reset & Base Styles */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: var(--header-height);
+    }
+
+    body {
+      font-family: var(--font-body);
+      background-color: var(--color-bg);
+      color: var(--color-dark);
+      line-height: 1.6;
+      padding-top: var(--header-height);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* Layout Containers */
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    .container-wide {
+      width: 100%;
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    section {
+      padding: 5rem 0;
+    }
+
+    /* Header & Navigation */
+    .site-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: var(--header-height);
+      background-color: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 300;
+      display: flex;
+      align-items: center;
+    }
+
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 1.15rem;
+      color: #FFFFFF;
+      letter-spacing: -0.5px;
+      flex-shrink: 0;
+    }
+
+    .brand-logo i {
+      color: var(--color-accent);
+      font-size: 1.25rem;
+    }
+
+    .nav-menu {
+      display: flex;
+      align-items: center;
+      gap: 1.15rem;
+      list-style: none;
+    }
+
+    .nav-item {
+      position: relative;
+      padding: 0.5rem 0;
+    }
+
+    .nav-link {
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      color: #94A3B8;
+      transition: color 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .nav-link:hover,
+    .nav-item:hover .nav-link {
+      color: #FFFFFF;
+    }
+
+    .nav-link-all {
+      color: var(--color-accent);
+      font-weight: 700;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      background-color: rgba(16, 185, 129, 0.08);
+      padding: 0.3rem 0.65rem;
+      border-radius: var(--radius-sm);
+      transition: all 0.2s ease;
+    }
+
+    .nav-link-all:hover {
+      background-color: rgba(16, 185, 129, 0.2);
+      color: #FFFFFF;
+      border-color: var(--color-accent);
+    }
+
+    .nav-arrow {
+      font-size: 0.625rem;
+      transition: transform 0.2s ease;
+      color: #64748B;
+    }
+
+    .nav-item:hover .nav-arrow {
+      transform: rotate(180deg);
+      color: var(--color-accent);
+    }
+
+    /* Hover Dropdown Menus */
+    .dropdown-menu {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      margin-top: 0.25rem;
+      background-color: #0F172A;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: var(--radius-md);
+      box-shadow: 0 16px 32px -4px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(37, 99, 235, 0.2);
+      padding: 0.6rem;
+      min-width: 200px;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transform: translateY(6px);
+      transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+      z-index: 310;
+    }
+
+    .dropdown-cols-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(135px, 1fr));
+      gap: 0.2rem 0.4rem;
+      min-width: 290px;
+    }
+
+    .dropdown-menu::before {
+      content: '';
+      position: absolute;
+      top: -5px;
+      left: 1.25rem;
+      width: 8px;
+      height: 8px;
+      background-color: #0F172A;
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      border-left: 1px solid rgba(255, 255, 255, 0.12);
+      transform: rotate(45deg);
+    }
+
+    .nav-item:hover .dropdown-menu {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    .dropdown-item-wrapper {
+      display: block;
+      width: 100%;
+      cursor: pointer;
+    }
+
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      padding: 0.45rem 0.65rem;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-mono);
+      font-size: 0.78125rem;
+      color: #94A3B8;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    .dropdown-item:hover {
+      background-color: rgba(37, 99, 235, 0.2);
+      color: #FFFFFF;
+    }
+
+    .drop-icon {
+      font-size: 0.75rem;
+      color: var(--color-primary);
+      width: 14px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .dropdown-item:hover .drop-icon {
+      color: var(--color-accent);
+    }
+
+    /* Section Components */
+    .section-tag {
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      font-weight: 700;
+      color: var(--color-primary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .section-title {
+      font-size: 2.25rem;
+      font-weight: 700;
+      color: var(--color-dark);
+      letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+      line-height: 1.2;
+    }
+
+    .section-subtitle {
+      font-size: 1.125rem;
+      color: var(--color-muted);
+      max-width: 680px;
+      margin-bottom: 3rem;
+    }
+
+    /* Hero Section */
+    .hero {
+      position: relative;
+      background-color: var(--color-dark);
+      color: #FFFFFF;
+      padding: 6rem 0 7rem;
+      overflow: hidden;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 3.5rem;
+      align-items: center;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background-color: rgba(37, 99, 235, 0.15);
+      border: 1px solid rgba(37, 99, 235, 0.4);
+      color: #60A5FA;
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      padding: 0.35rem 0.85rem;
+      border-radius: 999px;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-title {
+      font-size: 3rem;
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      margin-bottom: 1.25rem;
+    }
+
+    .hero-title span {
+      color: var(--color-accent);
+    }
+
+    .hero-description {
+      font-size: 1.125rem;
+      color: #94A3B8;
+      margin-bottom: 2.25rem;
+      line-height: 1.7;
+    }
+
+    /* Placeholder CTA Button Constraint */
+    .cta-placeholder-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 0.9rem 1.75rem;
+      color: #FFFFFF;
+      background-color: var(--color-primary);
+      border: 2px dashed #60A5FA;
+      border-radius: var(--radius-md);
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+    }
+
+    .cta-placeholder-button:hover {
+      background-color: #1D4ED8;
+      border-color: #93C5FD;
+      transform: translateY(-2px);
+    }
+
+    .hero-visual {
+      position: relative;
+    }
+
+    .hero-image-wrapper {
+      background-color: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 0.75rem;
+    }
+
+    .hero-image-wrapper img {
+      width: 100%;
+      height: 380px;
+      object-fit: cover;
+    }
+
+    /* Products Section */
+    .products-section {
+      background-color: var(--color-bg);
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 1.75rem;
+    }
+
+    .product-card {
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.25s ease;
+      position: relative;
+    }
+
+    .product-card:hover {
+      border-color: var(--color-primary);
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-4px);
+    }
+
+    .product-card.span-7 {
+      grid-column: span 7;
+    }
+
+    .product-card.span-5 {
+      grid-column: span 5;
+    }
+
+    .product-card.span-4 {
+      grid-column: span 4;
+    }
+
+    .product-card.span-6 {
+      grid-column: span 6;
+    }
+
+    .product-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+    }
+
+    .product-icon {
+      width: 48px;
+      height: 48px;
+      background-color: rgba(37, 99, 235, 0.08);
+      color: var(--color-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem;
+      border-radius: var(--radius-sm);
+    }
+
+    .product-card:nth-child(2) .product-icon {
+      background-color: rgba(16, 185, 129, 0.1);
+      color: var(--color-accent);
+    }
+
+    .product-code {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--color-muted);
+      background-color: var(--color-bg);
+      padding: 0.25rem 0.5rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--color-border);
+    }
+
+    .product-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--color-dark);
+      margin-bottom: 0.75rem;
+    }
+
+    .product-description {
+      color: var(--color-muted);
+      font-size: 0.9375rem;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+
+    .product-img-wrapper {
+      margin-top: auto;
+      border: 1px solid var(--color-border);
+    }
+
+    .product-img-wrapper img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+    }
+
+    /* Core Values Section */
+    .values-section {
+      background-color: var(--color-dark);
+      color: #FFFFFF;
+      position: relative;
+    }
+
+    .values-section .section-title {
+      color: #FFFFFF;
+    }
+
+    .values-section .section-subtitle {
+      color: #94A3B8;
+    }
+
+    .values-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+    }
+
+    .value-card {
+      background-color: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 2rem 1.5rem;
+      position: relative;
+      transition: background-color 0.2s ease;
+    }
+
+    .value-card:hover {
+      background-color: rgba(255, 255, 255, 0.06);
+      border-color: var(--color-accent);
+    }
+
+    .value-number {
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      color: var(--color-accent);
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .value-name {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      color: #FFFFFF;
+    }
+
+    .value-desc {
+      font-size: 0.875rem;
+      color: #94A3B8;
+      line-height: 1.6;
+    }
+
+    /* Audience & Workflow Section */
+    .workflows-section {
+      background-color: #FFFFFF;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .audience-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 4rem;
+    }
+
+    .audience-pill {
+      background-color: var(--color-bg);
+      border: 1px solid var(--color-border);
+      padding: 1.25rem;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .audience-pill i {
+      font-size: 1.5rem;
+      color: var(--color-primary);
+    }
+
+    .audience-pill span {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 0.9375rem;
+      color: var(--color-dark);
+    }
+
+    .workflow-box {
+      background-color: var(--color-dark);
+      color: #FFFFFF;
+      padding: 3rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 2rem;
+      border-left: 4px solid var(--color-accent);
+    }
+
+    .workflow-step {
+      position: relative;
+    }
+
+    .workflow-step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      right: -1rem;
+      top: 20%;
+      width: 1px;
+      height: 60%;
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .step-tag {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--color-accent);
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    .step-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .step-text {
+      font-size: 0.875rem;
+      color: #94A3B8;
+      line-height: 1.5;
+    }
+
+    /* ------------------------------------------------------------- */
+    /* DASHBOARD WORKSPACE STYLES (PURE HTML/CSS INTERACTIVE)      */
+    /* ------------------------------------------------------------- */
+    .dash-radio, .dash-checkbox {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .dashboard-section {
+      background-color: #0B1120;
+      color: #F8FAFC;
+      padding: 3rem 0 5rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      min-height: 100vh;
+    }
+
+    .dash-top-bar {
+      background-color: #0F172A;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-md);
+      padding: 0.85rem 1.25rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .dash-breadcrumbs {
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      color: #94A3B8;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .dash-breadcrumbs .active-crumb {
+      color: var(--color-accent);
+      font-weight: 700;
+    }
+
+    .dash-search-box {
+      position: relative;
+      flex: 1;
+      max-width: 420px;
+    }
+
+    .dash-search-box i {
+      position: absolute;
+      left: 0.85rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #64748B;
+      font-size: 0.875rem;
+    }
+
+    .dash-search-box input {
+      width: 100%;
+      padding: 0.5rem 0.85rem 0.5rem 2.35rem;
+      background-color: #1E293B;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: var(--radius-sm);
+      color: #FFFFFF;
+      font-family: var(--font-body);
+      font-size: 0.8125rem;
+      transition: all 0.2s ease;
+    }
+
+    .dash-search-box input:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);
+    }
+
+    .dash-user-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .theme-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: #94A3B8;
+      background-color: #1E293B;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 0.35rem 0.65rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+    }
+
+    .user-pill {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      background-color: #1E293B;
+      padding: 0.3rem 0.75rem 0.3rem 0.35rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .user-pill img {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .user-pill-info {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+    }
+
+    .user-pill-name {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: #FFFFFF;
+    }
+
+    .user-pill-plan {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--color-accent);
+    }
+
+    /* Dashboard Layout Structure */
+    .dashboard-layout {
+      display: flex;
+      gap: 1.25rem;
+      align-items: flex-start;
+      position: relative;
+    }
+
+    /* Left Sidebar */
+    .dash-sidebar {
+      width: 260px;
+      flex-shrink: 0;
+      background-color: #0F172A;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-md);
+      padding: 1.25rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .sidebar-group-title {
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      font-weight: 700;
+      color: #64748B;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 0.5rem;
+    }
+
+    .sidebar-nav-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .sidebar-item-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.6rem 0.75rem;
+      color: #94A3B8;
+      border-radius: var(--radius-sm);
+      font-size: 0.8125rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+
+    .sidebar-item-label:hover {
+      background-color: rgba(255, 255, 255, 0.06);
+      color: #FFFFFF;
+    }
+
+    .sidebar-item-left {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    .sidebar-item-left i {
+      width: 16px;
+      text-align: center;
+      color: var(--color-primary);
+    }
+
+    .sidebar-count-badge {
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      background-color: #1E293B;
+      color: #94A3B8;
+      padding: 0.1rem 0.4rem;
+      border-radius: 4px;
+    }
+
+    details.sidebar-accordion {
+      margin-top: 0.25rem;
+    }
+
+    details.sidebar-accordion summary {
+      list-style: none;
+      cursor: pointer;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: #64748B;
+      padding: 0.4rem 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    details.sidebar-accordion summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details.sidebar-accordion summary:hover {
+      color: #94A3B8;
+    }
+
+    .sidebar-sub-list {
+      padding-left: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      margin-top: 0.25rem;
+    }
+
+    .sidebar-sub-item {
+      font-size: 0.75rem;
+      color: #64748B;
+      padding: 0.3rem 0.5rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: block;
+    }
+
+    .sidebar-sub-item:hover {
+      color: var(--color-accent);
+      background-color: rgba(16, 185, 129, 0.08);
+    }
+
+    .sidebar-footer-badge {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--color-accent);
+      background-color: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      padding: 0.5rem;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: auto;
+    }
+
+    /* Central Content Workspace */
+    .dash-main-content {
+      flex: 1;
+      min-width: 0;
+      background-color: #0F172A;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+    }
+
+    /* Right Tool Inspector Panel */
+    .dash-right-panel {
+      width: 280px;
+      flex-shrink: 0;
+      background-color: #0F172A;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-md);
+      padding: 1.25rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      transition: all 0.25s ease;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .panel-title {
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      font-weight: 700;
+      color: #FFFFFF;
+    }
+
+    .panel-collapse-label {
+      cursor: pointer;
+      color: #64748B;
+      font-size: 0.875rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      background-color: #1E293B;
+      transition: color 0.2s ease;
+    }
+
+    .panel-collapse-label:hover {
+      color: #FFFFFF;
+    }
+
+    .right-panel-item {
+      background-color: #1E293B;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: var(--radius-sm);
+      padding: 0.65rem 0.75rem;
+      font-size: 0.78125rem;
+    }
+
+    .item-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.25rem;
+    }
+
+    .file-name {
+      color: #FFFFFF;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 160px;
+    }
+
+    .time-tag {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: #64748B;
+    }
+
+    /* Workspace Panes Control */
+    .workspace-pane {
+      display: none;
+    }
+
+    /* Radio active state rules for general and sub-tool pages */
+    #tool-all:checked ~ .dashboard-section .workspace-pane-all,
+    #tool-pdf:checked ~ .dashboard-section .workspace-pane-pdf,
+    #tool-pdf-merge:checked ~ .dashboard-section .workspace-pane-pdf-merge,
+    #tool-pdf-split:checked ~ .dashboard-section .workspace-pane-pdf-split,
+    #tool-pdf-compress:checked ~ .dashboard-section .workspace-pane-pdf-compress,
+    #tool-image:checked ~ .dashboard-section .workspace-pane-image,
+    #tool-image-convert:checked ~ .dashboard-section .workspace-pane-image-convert,
+    #tool-image-bg:checked ~ .dashboard-section .workspace-pane-image-bg,
+    #tool-dev:checked ~ .dashboard-section .workspace-pane-dev,
+    #tool-dev-json:checked ~ .dashboard-section .workspace-pane-dev-json,
+    #tool-dev-jwt:checked ~ .dashboard-section .workspace-pane-dev-jwt,
+    #tool-dev-base64:checked ~ .dashboard-section .workspace-pane-dev-base64,
+    #tool-dev-hash:checked ~ .dashboard-section .workspace-pane-dev-hash,
+    #tool-text:checked ~ .dashboard-section .workspace-pane-text,
+    #tool-text-counter:checked ~ .dashboard-section .workspace-pane-text-counter,
+    #tool-converter:checked ~ .dashboard-section .workspace-pane-converter,
+    #tool-converter-csv:checked ~ .dashboard-section .workspace-pane-converter-csv,
+    #tool-calculator:checked ~ .dashboard-section .workspace-pane-calculator,
+    #tool-calculator-roi:checked ~ .dashboard-section .workspace-pane-calculator-roi {
+      display: block;
+    }
+
+    /* Sidebar active highlight rules */
+    #tool-all:checked ~ .dashboard-section .sidebar-link-all,
+    #tool-pdf:checked ~ .dashboard-section .sidebar-link-pdf,
+    #tool-pdf-merge:checked ~ .dashboard-section .sidebar-link-pdf,
+    #tool-pdf-split:checked ~ .dashboard-section .sidebar-link-pdf,
+    #tool-pdf-compress:checked ~ .dashboard-section .sidebar-link-pdf,
+    #tool-image:checked ~ .dashboard-section .sidebar-link-image,
+    #tool-image-convert:checked ~ .dashboard-section .sidebar-link-image,
+    #tool-image-bg:checked ~ .dashboard-section .sidebar-link-image,
+    #tool-dev:checked ~ .dashboard-section .sidebar-link-dev,
+    #tool-dev-json:checked ~ .dashboard-section .sidebar-link-dev,
+    #tool-dev-jwt:checked ~ .dashboard-section .sidebar-link-dev,
+    #tool-dev-base64:checked ~ .dashboard-section .sidebar-link-dev,
+    #tool-dev-hash:checked ~ .dashboard-section .sidebar-link-dev,
+    #tool-text:checked ~ .dashboard-section .sidebar-link-text,
+    #tool-text-counter:checked ~ .dashboard-section .sidebar-link-text,
+    #tool-converter:checked ~ .dashboard-section .sidebar-link-converter,
+    #tool-converter-csv:checked ~ .dashboard-section .sidebar-link-converter,
+    #tool-calculator:checked ~ .dashboard-section .sidebar-link-calculator,
+    #tool-calculator-roi:checked ~ .dashboard-section .sidebar-link-calculator {
+      background-color: rgba(37, 99, 235, 0.25);
+      color: #FFFFFF;
+      font-weight: 600;
+      border-left: 3px solid var(--color-primary);
+    }
+
+    /* Dynamic breadcrumb active labels */
+    #tool-all:checked ~ .dashboard-section .active-crumb::after { content: "All Micro-Tools Directory"; }
+    #tool-pdf:checked ~ .dashboard-section .active-crumb::after { content: "PDF & Document Suite"; }
+    #tool-pdf-merge:checked ~ .dashboard-section .active-crumb::after { content: "PDF Merge & Reorder Tool"; }
+    #tool-pdf-split:checked ~ .dashboard-section .active-crumb::after { content: "PDF Splitter Tool"; }
+    #tool-pdf-compress:checked ~ .dashboard-section .active-crumb::after { content: "PDF Compressor & Security"; }
+    #tool-image:checked ~ .dashboard-section .active-crumb::after { content: "Image & Media Toolbox"; }
+    #tool-image-convert:checked ~ .dashboard-section .active-crumb::after { content: "Image Converter & Resizer"; }
+    #tool-image-bg:checked ~ .dashboard-section .active-crumb::after { content: "AI Background Remover"; }
+    #tool-dev:checked ~ .dashboard-section .active-crumb::after { content: "Developer Utilities & Encoders"; }
+    #tool-dev-json:checked ~ .dashboard-section .active-crumb::after { content: "JSON Formatter & Validator"; }
+    #tool-dev-jwt:checked ~ .dashboard-section .active-crumb::after { content: "JWT Decoder & Debugger"; }
+    #tool-dev-base64:checked ~ .dashboard-section .active-crumb::after { content: "Base64 Encoder / Decoder"; }
+    #tool-dev-hash:checked ~ .dashboard-section .active-crumb::after { content: "Hash & UUID Generator"; }
+    #tool-text:checked ~ .dashboard-section .active-crumb::after { content: "Text & Data Tools"; }
+    #tool-text-counter:checked ~ .dashboard-section .active-crumb::after { content: "Word Counter & Case Transformer"; }
+    #tool-converter:checked ~ .dashboard-section .active-crumb::after { content: "File Converters Suite"; }
+    #tool-converter-csv:checked ~ .dashboard-section .active-crumb::after { content: "CSV ↔ JSON Data Converter"; }
+    #tool-calculator:checked ~ .dashboard-section .active-crumb::after { content: "Business Calculators"; }
+    #tool-calculator-roi:checked ~ .dashboard-section .active-crumb::after { content: "SaaS ROI & Financial Calculator"; }
+
+    /* All Tools Grid */
+    .tools-filter-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .tools-filter-tabs {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-tab {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: var(--radius-sm);
+      background-color: #1E293B;
+      color: #94A3B8;
+      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.2s ease;
+    }
+
+    .filter-tab:hover,
+    .filter-tab.active {
+      background-color: var(--color-primary);
+      color: #FFFFFF;
+      border-color: var(--color-primary);
+    }
+
+    .workspace-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .dash-tool-card {
+      background-color: #1E293B;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.2s ease;
+    }
+
+    .dash-tool-card:hover {
+      border-color: var(--color-primary);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .tool-badge-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      background-color: rgba(37, 99, 235, 0.2);
+      color: #60A5FA;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+    }
+
+    .status-badge-live {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--color-accent);
+      background-color: rgba(16, 185, 129, 0.12);
+      padding: 0.15rem 0.45rem;
+      border-radius: 999px;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .dash-tool-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #FFFFFF;
+      margin-bottom: 0.4rem;
+    }
+
+    .dash-tool-desc {
+      font-size: 0.8125rem;
+      color: #94A3B8;
+      margin-bottom: 1.25rem;
+      line-height: 1.5;
+    }
+
+    .dash-launch-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #FFFFFF;
+      background-color: #334155;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      width: 100%;
+      text-align: center;
+    }
+
+    .dash-launch-btn:hover {
+      background-color: var(--color-primary);
+      border-color: var(--color-primary);
+    }
+
+    /* Individual Workspace Panel Layouts */
+    .workspace-header {
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .workspace-title-group h2 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    .workspace-title-group p {
+      font-size: 0.84375rem;
+      color: #94A3B8;
+      margin-top: 0.25rem;
+    }
+
+    .engine-tag {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--color-accent);
+      background-color: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 0.25rem 0.65rem;
+      border-radius: var(--radius-sm);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    /* Interactive Dropzone */
+    .dash-dropzone {
+      border: 2px dashed rgba(255, 255, 255, 0.2);
+      background-color: #1E293B;
+      border-radius: var(--radius-md);
+      padding: 2.25rem 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+
+    .dash-dropzone:hover {
+      border-color: var(--color-primary);
+      background-color: rgba(37, 99, 235, 0.05);
+    }
+
+    .dash-dropzone i {
+      font-size: 2.25rem;
+      color: var(--color-primary);
+      margin-bottom: 0.75rem;
+    }
+
+    .dropzone-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #FFFFFF;
+      margin-bottom: 0.25rem;
+    }
+
+    .dropzone-subtitle {
+      font-size: 0.8125rem;
+      color: #94A3B8;
+    }
+
+    /* PDF Page Grid Thumbnails */
+    .pdf-page-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .pdf-page-card {
+      background-color: #1E293B;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-sm);
+      padding: 0.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .pdf-page-card img {
+      width: 100%;
+      height: 130px;
+      object-fit: cover;
+      border-radius: 2px;
+    }
+
+    .pdf-page-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: #94A3B8;
+    }
+
+    /* Form Controls */
+    .dash-form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .dash-label {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: #94A3B8;
+      margin-bottom: 0.4rem;
+    }
+
+    .dash-input, .dash-select, .dash-textarea {
+      width: 100%;
+      background-color: #1E293B;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: var(--radius-sm);
+      color: #FFFFFF;
+      padding: 0.6rem 0.85rem;
+      font-family: var(--font-body);
+      font-size: 0.84375rem;
+      transition: border-color 0.2s ease;
+    }
+
+    .dash-textarea {
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      line-height: 1.5;
+      resize: vertical;
+    }
+
+    .dash-input:focus, .dash-select:focus, .dash-textarea:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);
+    }
+
+    .dash-slider-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .dash-slider {
+      flex: 1;
+      accent-color: var(--color-primary);
+      cursor: pointer;
+    }
+
+    .dash-slider-val {
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      color: var(--color-accent);
+      min-width: 45px;
+    }
+
+    /* Action Bar */
+    .action-btn-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      flex-wrap: wrap;
+      margin-top: 1.5rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .btn-primary-action {
+      background-color: var(--color-primary);
+      color: #FFFFFF;
+      border: none;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 0.8125rem;
+      padding: 0.65rem 1.35rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary-action:hover {
+      background-color: #1D4ED8;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary-action {
+      background-color: #334155;
+      color: #FFFFFF;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      padding: 0.65rem 1.15rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+    }
+
+    .btn-secondary-action:hover {
+      background-color: #475569;
+    }
+
+    .btn-accent-action {
+      background-color: var(--color-accent);
+      color: #0F172A;
+      border: none;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 0.8125rem;
+      padding: 0.65rem 1.35rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+    }
+
+    .btn-accent-action:hover {
+      background-color: #34D399;
+    }
+
+    /* Split Pane Layouts */
+    .split-editor-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+    }
+
+    .code-output-box {
+      background-color: #090D16;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: var(--radius-sm);
+      padding: 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      color: #38BDF8;
+      line-height: 1.6;
+      overflow-x: auto;
+      min-height: 220px;
+      white-space: pre;
+    }
+
+    .code-key { color: #F472B6; }
+    .code-str { color: #4ADE80; }
+    .code-num { color: #FACC15; }
+    .code-bool { color: #C084FC; }
+
+    /* Text Metrics Grid */
+    .text-metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 0.85rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .metric-card {
+      background-color: #1E293B;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-sm);
+      padding: 0.75rem;
+      text-align: center;
+    }
+
+    .metric-val {
+      font-family: var(--font-mono);
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--color-accent);
+    }
+
+    .metric-label {
+      font-size: 0.6875rem;
+      color: #94A3B8;
+      text-transform: uppercase;
+      margin-top: 0.2rem;
+    }
+
+    /* Tool Instruction & Guide Block Styles */
+    .tool-guide-card {
+      background-color: #1E293B;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      margin-top: 1.5rem;
+    }
+
+    .tool-guide-title {
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: #FFFFFF;
+      margin-bottom: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .tool-steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+
+    .step-item {
+      background-color: #0F172A;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: var(--radius-sm);
+      padding: 0.85rem;
+    }
+
+    .step-num {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--color-accent);
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+
+    .step-heading {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #FFFFFF;
+      margin-bottom: 0.25rem;
+    }
+
+    .step-desc {
+      font-size: 0.78125rem;
+      color: #94A3B8;
+      line-height: 1.4;
+    }
+
+    .hash-result-row {
+      background-color: #090D16;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-sm);
+      padding: 0.5rem 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.78125rem;
+    }
+
+    .hash-label {
+      color: #60A5FA;
+      font-weight: 700;
+      width: 80px;
+      flex-shrink: 0;
+    }
+
+    .hash-val {
+      color: #4ADE80;
+      word-break: break-all;
+      flex: 1;
+    }
+
+    /* Calculator Visual Ratio Bar */
+    .calc-ratio-bar {
+      height: 12px;
+      background-color: #1E293B;
+      border-radius: 999px;
+      overflow: hidden;
+      display: flex;
+      margin: 1.25rem 0;
+    }
+
+    .calc-seg-1 { width: 25%; background-color: var(--color-primary); }
+    .calc-seg-2 { width: 15%; background-color: #F59E0B; }
+    .calc-seg-3 { width: 60%; background-color: var(--color-accent); }
+
+    /* Panel Collapse Checkbox Behavior */
+    #toggle-right-panel:checked ~ .dashboard-section .dash-right-panel {
+      display: none;
+    }
+
+    /* Footer Styles */
+    .site-footer {
+      background-color: #090D16;
+      color: #94A3B8;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 4rem 0 2rem;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 3rem;
+      margin-bottom: 3rem;
+    }
+
+    .footer-brand-title {
+      font-family: var(--font-mono);
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #FFFFFF;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .footer-brand-title i {
+      color: var(--color-accent);
+    }
+
+    .footer-overview {
+      font-size: 0.875rem;
+      line-height: 1.6;
+      max-width: 420px;
+    }
+
+    .footer-col-title {
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      color: #FFFFFF;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 1rem;
+    }
+
+    .footer-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      font-size: 0.84375rem;
+    }
+
+    .footer-bottom {
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding-top: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.8125rem;
+      font-family: var(--font-mono);
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 1100px) {
+      .nav-menu {
+        gap: 0.75rem;
+      }
+      .nav-link {
+        font-size: 0.75rem;
+      }
+    }
+
+    @media (max-width: 1024px) {
+      .dashboard-layout {
+        flex-direction: column;
+      }
+      .dash-sidebar, .dash-right-panel {
+        width: 100%;
+      }
+      .split-editor-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 992px) {
+      .nav-menu {
+        display: none;
+      }
+
+      .hero-grid {
+        grid-template-columns: 1fr;
+        gap: 2.5rem;
+      }
+
+      .products-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .product-card.span-7,
+      .product-card.span-5,
+      .product-card.span-6,
+      .product-card.span-4 {
+        grid-column: span 1;
+      }
+
+      .values-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .audience-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .workflow-box {
+        grid-template-columns: 1fr;
+      }
+
+      .workflow-step:not(:last-child)::after {
+        display: none;
+      }
+
+      .footer-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .tool-steps-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .hero-title {
+        font-size: 2.125rem;
+      }
+
+      .values-grid,
+      .audience-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .footer-bottom {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Radio Controls for Pure CSS Active Tool Page & Category Selection -->
+  <input type="radio" name="dashboard-tool" id="tool-all" checked class="dash-radio">
+  <input type="radio" name="dashboard-tool" id="tool-pdf" class="dash-radio">
+  <input type="radio" name="dashboard-tool" id="tool-pdf-merge" class="dash-radio">
+  <input type="radio" name="dashboard-tool" id="tool-pdf-split" class="dash-radio">
+  <input type="radio" name="dashboard-tool" id="tool-pdf-compress" class="dash-radio">
+
+  <input type="radio" name="dashboard-tool" id="tool-image" class="dash-radio">
+  <input type="radio" name="dashboard-tool" id="tool-image-convert" class="dash-radio">
+  <input type="radio" name="dashboard-tool" id="tool-image-bg" class="dash-radio">
+
+  <input type="radio" name="dashboard-tool" id="tool-dev" class="dash-radio">
+  <input type="radio" name="dashboard-tool" id="tool-dev-json" class="dash-radio">
+  <input type="radio" name="dashboard-tool" id="tool-dev-jwt" class="dash-radio">
+  <input type="radio" name="dashboard-tool" id="tool-dev-base64" class="dash-radio">
+  <input type="radio" name="dashboard-tool" id="tool-dev-hash" class="dash-radio">
+
+  <input type="radio" name="dashboard-tool" id="tool-text" class="dash-radio">
+  <input type="radio" name="dashboard-tool" id="tool-text-counter" class="dash-radio">
+
+  <input type="radio" name="dashboard-tool" id="tool-converter" class="dash-radio">
+  <input type="radio" name="dashboard-tool" id="tool-converter-csv" class="dash-radio">
+
+  <input type="radio" name="dashboard-tool" id="tool-calculator" class="dash-radio">
+  <input type="radio" name="dashboard-tool" id="tool-calculator-roi" class="dash-radio">
+
+  <!-- Right Panel Collapse Toggle Checkbox -->
+  <input type="checkbox" id="toggle-right-panel" class="dash-checkbox">
+
+  <!-- Site Header -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="#overview" class="brand-logo">
+        <i class="fa-solid fa-layer-group"></i>
+        <span>ZapToolsCanvas</span>
+      </a>
+      <nav>
+        <ul class="nav-menu">
+          <!-- 1. PDF Tools -->
+          <li class="nav-item">
+            <label for="tool-pdf" style="cursor: pointer; display: block;">
+              <a href="#dashboard-workspace" class="nav-link">
+                PDF Tools <i class="fa-solid fa-chevron-down nav-arrow"></i>
+              </a>
+            </label>
+            <div class="dropdown-menu dropdown-cols-2">
+              <label for="tool-pdf-merge" class="dropdown-item-wrapper"><a href="#dashboard-workspace" class="dropdown-item"><i class="fa-solid fa-code-merge drop-icon"></i>Merge PDF</a></label>
+              <label for="tool-pdf-split" class="dropdown-item-wrapper"><a href="#dashboard-workspace" class="dropdown-item"><i class="fa-solid fa-arrows-split-up-and-left drop-icon"></i>Split PDF</a></label>
+              <label for="tool-pdf-compress" class="dropdown-item-wrapper"><a href="#dashboard-workspace" class="dropdown-item"><i class="fa-solid fa-file-contract drop-icon"></i>Compress</a></label>
+              <label for="tool-pdf" class="dropdown-item-wrapper"><a href="#dashboard-workspace" class="dropdown-item"><i class="fa-solid fa-file-export drop-icon"></i>Convert</a></label>
+              <label for="tool-pdf-compress" class="dropdown-item-wrapper"><a href="#dashboard-workspace" class="dropdown-item"><i class="fa-solid fa-lock drop-icon"></i>Protect</a></label>
+              <label for="tool-pdf" class="dropdown-item-wrapper"><a href="#dashboard-workspace" class="dropdown-item"><i class="fa-solid fa-lock-open drop-icon"></i>Unlock</a></label>
+              <label for="tool-pdf" class="dropdown-item-wrapper"><a href="#dashboard-workspace" class="dropdown-item"><i class="fa-solid fa-eye drop-icon"></i>OCR</a></label>
+              <label for="tool-pdf-merge" class="dropdown-item-wrapper"><a href="#dashboard-workspace" class="dropdown-item"><i class="fa-solid fa-signature drop-icon"></i>Sign</a></label>
+            </div>
+          </li>
+
+          <!-- 2. Image Tools -->
+          <li class="nav-item">
+            <label for="tool-image" style="cursor: pointer; display: block;">
+              <a href="#dashboard-workspace" class="nav-link">
+                Image Tools <i class="fa-solid fa-chevron-down nav-arrow"></i>
+              </a>
+            </label>
+            <div class="dropdown-menu">
+              <label for="tool-image-convert" class="dropdown-item-wrapper"><a href="#dashboard-workspace" class="dropdown-item"><i class="fa-solid fa-file-image drop-icon"></i>Convert Format</a></label>
+              <label for="tool-image-convert" class="dropdown-item-wrapper"><a href="#dashboard-workspace" class="dropdown-item"><i class="fa-solid fa-compress drop-icon"></i>Compress Quality</a></label>
+              <label for="tool-image-convert" class="dropdown-item-wrapper"><a href="#dashboard-workspace" class="dropdown-item"><i class="fa-solid fa-expand drop-icon"></i>Resize &amp; Scale</a></label>
+              <label for="tool-image" class="dropdown-item-wrapper"><a href="#dashboard-workspace" class="dropdown-item"><i class="fa-solid fa-crop-simple drop-icon"></i>Crop Image</a></label>
+              <label for="tool-image-bg" class="dropdown-item-wrapper"><a href="#dashboard-workspace" class="dropdown-item"><i class="fa-solid fa-wand-magic-sparkles drop-icon"></i>Background Remover</a></label>
+            </div>
+          </li>
+
+          <!-- 3. Developer Tools -->
+          <li class="nav-item">
+            <label for="tool-dev" style="cursor: pointer; display: block;">
+              <a href="#dashboard-workspace" class="nav-link">
+                Developer Tools <i class="fa-solid fa-chevron-down nav-arrow"></i>
+              </a>
+            </label>
+            <div class="dropdown-menu dropdown-cols-2">
+              <label for="tool-dev-json" class="dropdown-item-wrapper"><a href="#dashboard-workspace" class="dropdown-item"><i class="fa-solid fa-code drop-icon"></i>JSON Formatter</a></label>
+              <label for="tool-dev-jwt" class="dropdown-item-wrapper"><a href="#dashboard-workspace" class="dropdown-item"><i class="fa-solid fa-key drop-icon"></i>JWT Decoder</a></label>
+              <label for="tool-dev-base64" class="dropdown-item-wrapper"><a href="#dashboard-workspace" class="dropdown-item"><i class="fa-solid fa-binary drop-icon"></i>Base64 Encoder</a></label>
+              <label for="tool-dev-hash" class="dropdown-item-wrapper"><a href="#dashboard-workspace" class="dropdown-item"><i class="fa-solid fa-hashtag drop-icon"></i>Hash Generator</a></label>
+              <label for="tool-dev-hash" class="dropdown-item-wrapper"><a href="#dashboard-workspace" class="dropdown-item"><i class="fa-solid fa-fingerprint drop-icon"></i>UUID Generator</a></label>
+              <label for="tool-dev" class="dropdown-item-wrapper"><a href="#dashboard-workspace" class="dropdown-item"><i class="fa-solid fa-terminal drop-icon"></i>Regex Tester</a></label>
+            </div>
+          </li>
+
+          <!-- 4. Text Tools -->
+          <li class="nav-item">
+            <label for="tool-text" style="cursor: pointer; display: block;">
+              <a href="#dashboard-workspace" class="nav-link">
+                Text Tools <i class="fa-solid fa-chevron-down nav-arrow"></i>
+              </a>
+            </label>
+            <div class="dropdown-menu">
+              <label for="tool-text-counter" class="dropdown-item-wrapper"><a href="#dashboard-workspace" class="dropdown-item"><i class="fa-solid fa-font drop-icon"></i>Word Counter</a></label>
+              <label for="tool-text-counter" class="dropdown-item-wrapper"><a href="#dashboard-workspace" class="dropdown-item"><i class="fa-solid fa-text-height drop-icon"></i>Case Converter</a></label>
+              <label for="tool-text-counter" class="dropdown-item-wrapper"><a href="#dashboard-workspace" class="dropdown-item"><i class="fa-solid fa-filter drop-icon"></i>Remove Duplicates</a></label>
+              <label for="tool-text-counter" class="dropdown-item-wrapper"><a href="#dashboard-workspace" class="dropdown-item"><i class="fa-solid fa-magnifying-glass-arrow-right drop-icon"></i>Find &amp; Replace</a></label>
+            </div>
+          </li>
+
+          <!-- 5. Converters -->
+          <li class="nav-item">
+            <label for="tool-converter" style="cursor: pointer; display: block;">
+              <a href="#dashboard-workspace" class="nav-link">
+                Converters <i class="fa-solid fa-chevron-down nav-arrow"></i>
+              </a>
+            </label>
+            <div class="dropdown-menu dropdown-cols-2">
+              <label for="tool-pdf" class="dropdown-item-wrapper"><a href="#dashboard-workspace" class="dropdown-item"><i class="fa-solid fa-file-pdf drop-icon"></i>PDF Converter</a></label>
+              <label for="tool-image-convert" class="dropdown-item-wrapper"><a href="#dashboard-workspace" class="dropdown-item"><i class="fa-solid fa-file-image drop-icon"></i>Image Converter</a></label>
+              <label for="tool-converter-csv" class="dropdown-item-wrapper"><a href="#dashboard-workspace" class="dropdown-item"><i class="fa-solid fa-file-csv drop-icon"></i>CSV to JSON</a></label>
+              <label for="tool-converter-csv" class="dropdown-item-wrapper"><a href="#dashboard-workspace" class="dropdown-item"><i class="fa-solid fa-file-code drop-icon"></i>JSON to CSV</a></label>
+              <label for="tool-converter" class="dropdown-item-wrapper"><a href="#dashboard-workspace" class="dropdown-item"><i class="fa-solid fa-gear drop-icon"></i>YAML to JSON</a></label>
+            </div>
+          </li>
+
+          <!-- 6. Calculators -->
+          <li class="nav-item">
+            <label for="tool-calculator" style="cursor: pointer; display: block;">
+              <a href="#dashboard-workspace" class="nav-link">
+                Calculators <i class="fa-solid fa-chevron-down nav-arrow"></i>
+              </a>
+            </label>
+            <div class="dropdown-menu">
+              <label for="tool-calculator-roi" class="dropdown-item-wrapper"><a href="#dashboard-workspace" class="dropdown-item"><i class="fa-solid fa-calculator drop-icon"></i>Finance ROI</a></label>
+              <label for="tool-calculator" class="dropdown-item-wrapper"><a href="#dashboard-workspace" class="dropdown-item"><i class="fa-solid fa-square-root-variable drop-icon"></i>Math &amp; Ratios</a></label>
+              <label for="tool-calculator-roi" class="dropdown-item-wrapper"><a href="#dashboard-workspace" class="dropdown-item"><i class="fa-solid fa-chart-line drop-icon"></i>Margin &amp; Revenue</a></label>
+              <label for="tool-calculator-roi" class="dropdown-item-wrapper"><a href="#dashboard-workspace" class="dropdown-item"><i class="fa-solid fa-heart-pulse drop-icon"></i>Health &amp; SaaS</a></label>
+            </div>
+          </li>
+
+          <!-- 7. All Tools -->
+          <li class="nav-item">
+            <label for="tool-all" class="dropdown-item-wrapper" style="cursor: pointer; display: block;">
+              <a href="#dashboard-workspace" class="nav-link nav-link-all">All Tools</a>
+            </label>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero Section -->
+    <section id="overview" class="hero">
+      <div class="container hero-grid">
+        <div class="hero-content">
+          <div class="hero-badge">
+            <i class="fa-solid fa-bolt"></i> ALL-IN-ONE MICRO-SAAS PLATFORM
+          </div>
+          <h1 class="hero-title">Your go-to hub for developer utilities, file converters, and document tools.</h1>
+          <p class="hero-description">
+            ZapToolsCanvas provides versatile tools and workflows to help students, office workers, developers, and professionals execute tasks, market solutions, or build micro-SaaS business models.
+          </p>
+          <div class="hero-cta-wrapper">
+            <!-- Exactly one CTA placeholder button on the entire site -->
+            <a href="#" class="cta-placeholder-button">
+              <i class="fa-solid fa-arrow-right"></i> [Your link here]
+            </a>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="hero-image-wrapper">
+            <img 
+              src="https://labs.google.com/pomelli_downloads/websites/8uYQXSav_664FGPMIZ84IT/resources/9SdS-Q9TL4jcvm5GS6H_SP?authuser=0" 
+              alt="Abstract digital canvas graphic" 
+              data-alt="Abstract modern dark slate technical texture with soft electric blue and emerald green geometric line grids and micro-interface nodes. Sleek minimalist background, deep contrast, clean dark mode technology aesthetic, no text or signage."
+            >
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Products & Tools Section -->
+    <section id="products" class="products-section">
+      <div class="container">
+        <span class="section-tag">/ 01 PRODUCT SUITES</span>
+        <h2 class="section-title">Functional Utilities & Modular Tools</h2>
+        <p class="section-subtitle">A practical lineup engineered to streamline document conversion, developer tasks, data manipulation, media processing, and business strategy.</p>
+
+        <div class="products-grid">
+          <!-- Product 1 -->
+          <div class="product-card span-7">
+            <div>
+              <div class="product-header">
+                <div class="product-icon">
+                  <i class="fa-solid fa-file-pdf"></i>
+                </div>
+                <span class="product-code">SUITE_01</span>
+              </div>
+              <h3 class="product-title">PDF & Document Processing Suite</h3>
+              <p class="product-description">Offers tools to merge, split, compress, secure, and convert PDFs, along with OCR text recognition and page management.</p>
+            </div>
+            <div class="product-img-wrapper">
+              <img 
+                src="https://labs.google.com/pomelli_downloads/websites/8uYQXSav_664FGPMIZ84IT/resources/9ZUxjquSumt5abHvo27OGy?authuser=0" 
+                alt="Document processing tool preview" 
+                data-alt="Macro close-up of organized glass document planes floating above a dark slate surface with soft royal blue accent light reflections. Technical modern file management aesthetic, high precision depth of field, no text or lettering."
+              >
+            </div>
+          </div>
+
+          <!-- Product 2 -->
+          <div class="product-card span-5">
+            <div>
+              <div class="product-header">
+                <div class="product-icon">
+                  <i class="fa-solid fa-code"></i>
+                </div>
+                <span class="product-code">SUITE_02</span>
+              </div>
+              <h3 class="product-title">Developer Utilities & Encoders</h3>
+              <p class="product-description">Provides encoding and decoding services, JSON/XML formatting, JWT decoding, hash generation, minification, and regex testing tools.</p>
+            </div>
+            <div class="product-img-wrapper">
+              <img 
+                src="https://labs.google.com/pomelli_downloads/websites/8uYQXSav_664FGPMIZ84IT/resources/8DOdkBxKZPT9aMo-CpFkOV?authuser=0" 
+                alt="Developer code syntax tool preview" 
+                data-alt="Close-up of structured glowing code blocks and syntax highlighting patterns on a dark slate monitor screen. Soft neon emerald and electric blue lines, crisp developer workstation aesthetic, no readable text."
+              >
+            </div>
+          </div>
+
+          <!-- Product 3 -->
+          <div class="product-card span-4">
+            <div>
+              <div class="product-header">
+                <div class="product-icon">
+                  <i class="fa-solid fa-font"></i>
+                </div>
+                <span class="product-code">SUITE_03</span>
+              </div>
+              <h3 class="product-title">Text & Data Manipulation</h3>
+              <p class="product-description">Provides word/character counters, text transformers, CSV/JSON converters, and Markdown generators.</p>
+            </div>
+          </div>
+
+          <!-- Product 4 -->
+          <div class="product-card span-4">
+            <div>
+              <div class="product-header">
+                <div class="product-icon">
+                  <i class="fa-solid fa-photo-film"></i>
+                </div>
+                <span class="product-code">SUITE_04</span>
+              </div>
+              <h3 class="product-title">Image & Media Toolbox</h3>
+              <p class="product-description">Offers image format conversion, compression, resizing, and video-to-GIF tools.</p>
+            </div>
+            <div class="product-img-wrapper">
+              <img 
+                src="https://labs.google.com/pomelli_downloads/websites/8uYQXSav_664FGPMIZ84IT/resources/a_YSb2clNEvc3RGWI6_kad?authuser=0" 
+                alt="Media conversion tool preview" 
+                data-alt="Close-up view of geometric image aspect ratio grids and vibrant digital color swatches on a modern design interface. Slate grey backdrop with royal blue glowing accents, crisp technical precision, no text."
+              >
+            </div>
+          </div>
+
+          <!-- Product 5 -->
+          <div class="product-card span-4">
+            <div>
+              <div class="product-header">
+                <div class="product-icon">
+                  <i class="fa-solid fa-chart-line"></i>
+                </div>
+                <span class="product-code">SUITE_05</span>
+              </div>
+              <h3 class="product-title">Business & Brand Strategy Tools</h3>
+              <p class="product-description">Assists with business profile analysis, feature prioritization, target audience scoping, and go-to-market strategy creation.</p>
+            </div>
+            <div class="product-img-wrapper">
+              <img 
+                src="https://labs.google.com/pomelli_downloads/websites/8uYQXSav_664FGPMIZ84IT/resources/bw4ClJCGfkT5b4cCIAnO9I?authuser=0" 
+                alt="Strategy matrix planning preview" 
+                data-alt="Modern desk setup with dark slate strategy canvas, clean wireframe cards, and a minimalist black pen. Soft overhead lighting, elegant structured layout, practical business focus, no text or signage."
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Core Values Section -->
+    <section id="values" class="values-section">
+      <div class="container">
+        <span class="section-tag">/ 02 CORE VALUES</span>
+        <h2 class="section-title">Built for Practical Purpose</h2>
+        <p class="section-subtitle">Our design positioning and core principles shape every tool we offer.</p>
+
+        <div class="values-grid">
+          <div class="value-card">
+            <span class="value-number">01 // VALUE</span>
+            <h3 class="value-name">Efficiency</h3>
+            <p class="value-desc">Fast-executing micro-tools that reduce friction and eliminate multi-step workflow bloat.</p>
+          </div>
+
+          <div class="value-card">
+            <span class="value-number">02 // VALUE</span>
+            <h3 class="value-name">Accessibility</h3>
+            <p class="value-desc">Mass-market utility designed to be immediately usable for students and seasoned engineers alike.</p>
+          </div>
+
+          <div class="value-card">
+            <span class="value-number">03 // VALUE</span>
+            <h3 class="value-name">Collaboration</h3>
+            <p class="value-desc">Shared workflows and clean outputs that foster seamless peer-to-peer technical alignment.</p>
+          </div>
+
+          <div class="value-card">
+            <span class="value-number">04 // VALUE</span>
+            <h3 class="value-name">Practicality</h3>
+            <p class="value-desc">Functional utilitarian design strictly focused on helping users execute real-world tasks.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Workflows & Audience Section -->
+    <section id="workflows" class="workflows-section">
+      <div class="container">
+        <span class="section-tag">/ 03 AUDIENCE & WORKFLOWS</span>
+        <h2 class="section-title">Who Uses ZapToolsCanvas?</h2>
+        <p class="section-subtitle">Tailored utility paths supporting a diverse spectrum of digital creators and professionals.</p>
+
+        <div class="audience-grid">
+          <div class="audience-pill">
+            <i class="fa-solid fa-graduation-cap"></i>
+            <span>Students</span>
+          </div>
+          <div class="audience-pill">
+            <i class="fa-solid fa-briefcase"></i>
+            <span>Office Workers</span>
+          </div>
+          <div class="audience-pill">
+            <i class="fa-solid fa-terminal"></i>
+            <span>Developers</span>
+          </div>
+          <div class="audience-pill">
+            <i class="fa-solid fa-user-gear"></i>
+            <span>Professionals</span>
+          </div>
+        </div>
+
+        <div class="workflow-box">
+          <div class="workflow-step">
+            <span class="step-tag">PHASE 01</span>
+            <h3 class="step-title">Execute Tasks</h3>
+            <p class="step-text">Convert documents, format JSON payloads, or edit image assets instantly with dedicated utility micro-tools.</p>
+          </div>
+          <div class="workflow-step">
+            <span class="step-tag">PHASE 02</span>
+            <h3 class="step-title">Market Solutions</h3>
+            <p class="step-text">Scope target audiences, analyze business profiles, and prioritize product features for go-to-market launching.</p>
+          </div>
+          <div class="workflow-step">
+            <span class="step-tag">PHASE 03</span>
+            <h3 class="step-title">Build Micro-SaaS Models</h3>
+            <p class="step-text">Leverage modular developer toolsets and practical workflows to construct and validate sustainable business models.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------------------- -->
+    <!-- INTERACTIVE TOOL PAGES & DASHBOARD WORKSPACE SECTION        -->
+    <!-- ------------------------------------------------------------- -->
+    <section id="dashboard-workspace" class="dashboard-section">
+      <div class="container-wide">
+
+        <!-- Top Bar -->
+        <div class="dash-top-bar">
+          <div class="dash-breadcrumbs">
+            <span>ZapToolsCanvas</span> <i class="fa-solid fa-chevron-right" style="font-size: 0.65rem;"></i> <span>Workspace</span> <i class="fa-solid fa-chevron-right" style="font-size: 0.65rem;"></i> <span class="active-crumb"></span>
+          </div>
+
+          <div class="dash-search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" placeholder="Search 50+ tools, converters, or schemas... (Press '/')" aria-label="Global search tools">
+          </div>
+
+          <div class="dash-user-actions">
+            <div class="theme-badge"><i class="fa-solid fa-moon"></i> Dark Mode</div>
+            <div class="user-pill">
+              <img src="https://labs.google.com/pomelli_downloads/websites/8uYQXSav_664FGPMIZ84IT/resources/8KexJAVYN7LezwJZ-s74qg?authuser=0" alt="User Avatar" data-alt="Minimalist modern SaaS user avatar icon with dark slate circular framing and glowing royal blue border, ultra clean design aesthetic, no text.">
+              <div class="user-pill-info">
+                <span class="user-pill-name">Alex Rivera</span>
+                <span class="user-pill-plan">PRO SUITE</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dashboard 3-Column Layout -->
+        <div class="dashboard-layout">
+
+          <!-- Left Sidebar Nav -->
+          <aside class="dash-sidebar">
+            <div>
+              <div class="sidebar-group-title">Quick Access</div>
+              <div class="sidebar-nav-list">
+                <label for="tool-all" class="sidebar-item-label sidebar-link-all">
+                  <span class="sidebar-item-left"><i class="fa-solid fa-border-all"></i> All Tools Directory</span>
+                  <span class="sidebar-count-badge">52</span>
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <div class="sidebar-group-title">Tool Suites</div>
+              <div class="sidebar-nav-list">
+                <label for="tool-pdf" class="sidebar-item-label sidebar-link-pdf">
+                  <span class="sidebar-item-left"><i class="fa-solid fa-file-pdf"></i> PDF &amp; Documents</span>
+                  <span class="sidebar-count-badge">12</span>
+                </label>
+                <details class="sidebar-accordion" open>
+                  <summary><span>PDF Tools</span> <i class="fa-solid fa-chevron-down" style="font-size: 0.6rem;"></i></summary>
+                  <div class="sidebar-sub-list">
+                    <label for="tool-pdf" class="sidebar-sub-item">• Suite Overview</label>
+                    <label for="tool-pdf-merge" class="sidebar-sub-item">• Merge &amp; Reorder</label>
+                    <label for="tool-pdf-split" class="sidebar-sub-item">• Split Pages</label>
+                    <label for="tool-pdf-compress" class="sidebar-sub-item">• Compression &amp; Protect</label>
+                  </div>
+                </details>
+
+                <label for="tool-image" class="sidebar-item-label sidebar-link-image">
+                  <span class="sidebar-item-left"><i class="fa-solid fa-image"></i> Image &amp; Media</span>
+                  <span class="sidebar-count-badge">8</span>
+                </label>
+                <details class="sidebar-accordion">
+                  <summary><span>Image Tools</span> <i class="fa-solid fa-chevron-down" style="font-size: 0.6rem;"></i></summary>
+                  <div class="sidebar-sub-list">
+                    <label for="tool-image" class="sidebar-sub-item">• Suite Overview</label>
+                    <label for="tool-image-convert" class="sidebar-sub-item">• Format &amp; Resize</label>
+                    <label for="tool-image-bg" class="sidebar-sub-item">• AI Background Remover</label>
+                  </div>
+                </details>
+
+                <label for="tool-dev" class="sidebar-item-label sidebar-link-dev">
+                  <span class="sidebar-item-left"><i class="fa-solid fa-code"></i> Developer Utilities</span>
+                  <span class="sidebar-count-badge">15</span>
+                </label>
+                <details class="sidebar-accordion">
+                  <summary><span>Dev Tools</span> <i class="fa-solid fa-chevron-down" style="font-size: 0.6rem;"></i></summary>
+                  <div class="sidebar-sub-list">
+                    <label for="tool-dev" class="sidebar-sub-item">• Suite Overview</label>
+                    <label for="tool-dev-json" class="sidebar-sub-item">• JSON Formatter</label>
+                    <label for="tool-dev-jwt" class="sidebar-sub-item">• JWT Decoder</label>
+                    <label for="tool-dev-base64" class="sidebar-sub-item">• Base64 Encoder</label>
+                    <label for="tool-dev-hash" class="sidebar-sub-item">• Hash &amp; UUID Generator</label>
+                  </div>
+                </details>
+
+                <label for="tool-text" class="sidebar-item-label sidebar-link-text">
+                  <span class="sidebar-item-left"><i class="fa-solid fa-font"></i> Text &amp; Data Tools</span>
+                  <span class="sidebar-count-badge">9</span>
+                </label>
+                <details class="sidebar-accordion">
+                  <summary><span>Text Tools</span> <i class="fa-solid fa-chevron-down" style="font-size: 0.6rem;"></i></summary>
+                  <div class="sidebar-sub-list">
+                    <label for="tool-text" class="sidebar-sub-item">• Suite Overview</label>
+                    <label for="tool-text-counter" class="sidebar-sub-item">• Word Counter &amp; Cases</label>
+                  </div>
+                </details>
+
+                <label for="tool-converter" class="sidebar-item-label sidebar-link-converter">
+                  <span class="sidebar-item-left"><i class="fa-solid fa-arrow-right-arrow-left"></i> File Converters</span>
+                  <span class="sidebar-count-badge">6</span>
+                </label>
+                <details class="sidebar-accordion">
+                  <summary><span>Converters</span> <i class="fa-solid fa-chevron-down" style="font-size: 0.6rem;"></i></summary>
+                  <div class="sidebar-sub-list">
+                    <label for="tool-converter" class="sidebar-sub-item">• Suite Overview</label>
+                    <label for="tool-converter-csv" class="sidebar-sub-item">• CSV ↔ JSON Converter</label>
+                  </div>
+                </details>
+
+                <label for="tool-calculator" class="sidebar-item-label sidebar-link-calculator">
+                  <span class="sidebar-item-left"><i class="fa-solid fa-calculator"></i> Business Calculators</span>
+                  <span class="sidebar-count-badge">8</span>
+                </label>
+                <details class="sidebar-accordion">
+                  <summary><span>Calculators</span> <i class="fa-solid fa-chevron-down" style="font-size: 0.6rem;"></i></summary>
+                  <div class="sidebar-sub-list">
+                    <label for="tool-calculator" class="sidebar-sub-item">• Suite Overview</label>
+                    <label for="tool-calculator-roi" class="sidebar-sub-item">• SaaS ROI Calculator</label>
+                  </div>
+                </details>
+              </div>
+            </div>
+
+            <div class="sidebar-footer-badge">
+              <i class="fa-solid fa-shield-halved"></i>
+              <span>100% Client-Side Local Processing</span>
+            </div>
+          </aside>
+
+          <!-- Central Content Workspace -->
+          <main class="dash-main-content">
+
+            <!-- PANE 1: ALL TOOLS DIRECTORY GRID -->
+            <div class="workspace-pane workspace-pane-all">
+              <div class="workspace-header">
+                <div class="workspace-title-group">
+                  <h2><i class="fa-solid fa-border-all" style="color: var(--color-primary);"></i> Micro-Tools Directory</h2>
+                  <p>Discover, filter, and launch micro-services engineered for speed and precision.</p>
+                </div>
+                <span class="engine-tag"><i class="fa-solid fa-bolt"></i> Live WASM Engine</span>
+              </div>
+
+              <div class="tools-filter-bar">
+                <div class="tools-filter-tabs">
+                  <label for="tool-all" class="filter-tab active">All (52)</label>
+                  <label for="tool-pdf" class="filter-tab">PDF (12)</label>
+                  <label for="tool-image" class="filter-tab">Image (8)</label>
+                  <label for="tool-dev" class="filter-tab">Developer (15)</label>
+                  <label for="tool-text" class="filter-tab">Text (9)</label>
+                  <label for="tool-converter" class="filter-tab">Converters (6)</label>
+                  <label for="tool-calculator" class="filter-tab">Calculators (8)</label>
+                </div>
+              </div>
+
+              <div class="workspace-grid">
+                <!-- Card 1 -->
+                <div class="dash-tool-card">
+                  <div>
+                    <div class="card-top-row">
+                      <div class="tool-badge-icon"><i class="fa-solid fa-file-pdf"></i></div>
+                      <span class="status-badge-live">PDF SUITE</span>
+                    </div>
+                    <h3 class="dash-tool-title">PDF Merge &amp; Reorder</h3>
+                    <p class="dash-tool-desc">Combine multiple PDF files, select pages, rotate, split, compress, and sign digitally.</p>
+                  </div>
+                  <label for="tool-pdf-merge" class="dash-launch-btn">Launch Tool Page <i class="fa-solid fa-arrow-right"></i></label>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="dash-tool-card">
+                  <div>
+                    <div class="card-top-row">
+                      <div class="tool-badge-icon"><i class="fa-solid fa-arrows-split-up-and-left"></i></div>
+                      <span class="status-badge-live">PDF SUITE</span>
+                    </div>
+                    <h3 class="dash-tool-title">PDF Page Splitter</h3>
+                    <p class="dash-tool-desc">Separate pages, extract ranges, and split large PDF books into standalone documents.</p>
+                  </div>
+                  <label for="tool-pdf-split" class="dash-launch-btn">Launch Tool Page <i class="fa-solid fa-arrow-right"></i></label>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="dash-tool-card">
+                  <div>
+                    <div class="card-top-row">
+                      <div class="tool-badge-icon" style="color: var(--color-accent); background-color: rgba(16, 185, 129, 0.15);"><i class="fa-solid fa-image"></i></div>
+                      <span class="status-badge-live">MEDIA</span>
+                    </div>
+                    <h3 class="dash-tool-title">Image Converter &amp; Resizer</h3>
+                    <p class="dash-tool-desc">Resize width/height, crop with presets, convert PNG/JPG/WebP, and adjust compression.</p>
+                  </div>
+                  <label for="tool-image-convert" class="dash-launch-btn">Launch Tool Page <i class="fa-solid fa-arrow-right"></i></label>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="dash-tool-card">
+                  <div>
+                    <div class="card-top-row">
+                      <div class="tool-badge-icon" style="color: var(--color-accent); background-color: rgba(16, 185, 129, 0.15);"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                      <span class="status-badge-live">MEDIA</span>
+                    </div>
+                    <h3 class="dash-tool-title">AI Background Remover</h3>
+                    <p class="dash-tool-desc">Isolate subjects from backgrounds and export transparent PNGs automatically.</p>
+                  </div>
+                  <label for="tool-image-bg" class="dash-launch-btn">Launch Tool Page <i class="fa-solid fa-arrow-right"></i></label>
+                </div>
+
+                <!-- Card 5 -->
+                <div class="dash-tool-card">
+                  <div>
+                    <div class="card-top-row">
+                      <div class="tool-badge-icon"><i class="fa-solid fa-code"></i></div>
+                      <span class="status-badge-live">DEV TOOLS</span>
+                    </div>
+                    <h3 class="dash-tool-title">JSON Formatter &amp; Validator</h3>
+                    <p class="dash-tool-desc">Format, minify, and validate JSON payloads with syntax highlighting and formatting.</p>
+                  </div>
+                  <label for="tool-dev-json" class="dash-launch-btn">Launch Tool Page <i class="fa-solid fa-arrow-right"></i></label>
+                </div>
+
+                <!-- Card 6 -->
+                <div class="dash-tool-card">
+                  <div>
+                    <div class="card-top-row">
+                      <div class="tool-badge-icon"><i class="fa-solid fa-key"></i></div>
+                      <span class="status-badge-live">DEV TOOLS</span>
+                    </div>
+                    <h3 class="dash-tool-title">JWT Decoder &amp; Debugger</h3>
+                    <p class="dash-tool-desc">Inspect JSON Web Token headers, payloads, signatures, and verify expiration dates.</p>
+                  </div>
+                  <label for="tool-dev-jwt" class="dash-launch-btn">Launch Tool Page <i class="fa-solid fa-arrow-right"></i></label>
+                </div>
+
+                <!-- Card 7 -->
+                <div class="dash-tool-card">
+                  <div>
+                    <div class="card-top-row">
+                      <div class="tool-badge-icon" style="color: var(--color-accent); background-color: rgba(16, 185, 129, 0.15);"><i class="fa-solid fa-font"></i></div>
+                      <span class="status-badge-live">TEXT UTILS</span>
+                    </div>
+                    <h3 class="dash-tool-title">Word Counter &amp; Cases</h3>
+                    <p class="dash-tool-desc">Live word metrics, character statistics, case transformations, and find &amp; replace.</p>
+                  </div>
+                  <label for="tool-text-counter" class="dash-launch-btn">Launch Tool Page <i class="fa-solid fa-arrow-right"></i></label>
+                </div>
+
+                <!-- Card 8 -->
+                <div class="dash-tool-card">
+                  <div>
+                    <div class="card-top-row">
+                      <div class="tool-badge-icon"><i class="fa-solid fa-arrow-right-arrow-left"></i></div>
+                      <span class="status-badge-live">CONVERTER</span>
+                    </div>
+                    <h3 class="dash-tool-title">CSV ↔ JSON Converter</h3>
+                    <p class="dash-tool-desc">Parse CSV tables into clean JSON array structures with configurable delimiter options.</p>
+                  </div>
+                  <label for="tool-converter-csv" class="dash-launch-btn">Launch Tool Page <i class="fa-solid fa-arrow-right"></i></label>
+                </div>
+
+                <!-- Card 9 -->
+                <div class="dash-tool-card">
+                  <div>
+                    <div class="card-top-row">
+                      <div class="tool-badge-icon" style="color: var(--color-accent); background-color: rgba(16, 185, 129, 0.15);"><i class="fa-solid fa-calculator"></i></div>
+                      <span class="status-badge-live">FINANCE</span>
+                    </div>
+                    <h3 class="dash-tool-title">SaaS ROI Calculator</h3>
+                    <p class="dash-tool-desc">Interactive inputs and sliders to calculate investment ROI, profit margins, and payback.</p>
+                  </div>
+                  <label for="tool-calculator-roi" class="dash-launch-btn">Launch Tool Page <i class="fa-solid fa-arrow-right"></i></label>
+                </div>
+              </div>
+            </div>
+
+            <!-- PANE 2: PDF SUITE OVERVIEW -->
+            <div class="workspace-pane workspace-pane-pdf">
+              <div class="workspace-header">
+                <div class="workspace-title-group">
+                  <h2><i class="fa-solid fa-file-pdf" style="color: var(--color-primary);"></i> PDF Suite Hub</h2>
+                  <p>Comprehensive PDF utilities: Merge, Split, Compress, Protect, Convert, and OCR.</p>
+                </div>
+                <span class="engine-tag"><i class="fa-solid fa-shield-halved"></i> 100% Private Client-Side</span>
+              </div>
+
+              <div class="workspace-grid">
+                <div class="dash-tool-card">
+                  <div>
+                    <div class="card-top-row">
+                      <div class="tool-badge-icon"><i class="fa-solid fa-code-merge"></i></div>
+                      <span class="status-badge-live">TOOL PAGE</span>
+                    </div>
+                    <h3 class="dash-tool-title">PDF Merge &amp; Reorder</h3>
+                    <p class="dash-tool-desc">Combine multiple documents into one structured PDF file with page rotation.</p>
+                  </div>
+                  <label for="tool-pdf-merge" class="dash-launch-btn">Open Merge Tool Page <i class="fa-solid fa-arrow-right"></i></label>
+                </div>
+
+                <div class="dash-tool-card">
+                  <div>
+                    <div class="card-top-row">
+                      <div class="tool-badge-icon"><i class="fa-solid fa-arrows-split-up-and-left"></i></div>
+                      <span class="status-badge-live">TOOL PAGE</span>
+                    </div>
+                    <h3 class="dash-tool-title">PDF Splitter</h3>
+                    <p class="dash-tool-desc">Extract custom page ranges or separate pages into distinct individual files.</p>
+                  </div>
+                  <label for="tool-pdf-split" class="dash-launch-btn">Open Splitter Tool Page <i class="fa-solid fa-arrow-right"></i></label>
+                </div>
+
+                <div class="dash-tool-card">
+                  <div>
+                    <div class="card-top-row">
+                      <div class="tool-badge-icon"><i class="fa-solid fa-file-contract"></i></div>
+                      <span class="status-badge-live">TOOL PAGE</span>
+                    </div>
+                    <h3 class="dash-tool-title">PDF Compress &amp; Protect</h3>
+                    <p class="dash-tool-desc">Reduce PDF size up to 80% and encrypt with password protection.</p>
+                  </div>
+                  <label for="tool-pdf-compress" class="dash-launch-btn">Open Compress Tool Page <i class="fa-solid fa-arrow-right"></i></label>
+                </div>
+              </div>
+            </div>
+
+            <!-- PANE 3: DEDICATED TOOL PAGE - PDF MERGE & REORDER -->
+            <div class="workspace-pane workspace-pane-pdf-merge">
+              <div class="workspace-header">
+                <div class="workspace-title-group">
+                  <h2><i class="fa-solid fa-code-merge" style="color: var(--color-primary);"></i> PDF Merge &amp; Reorder Tool Page</h2>
+                  <p>Combine multiple PDF documents into a single organized file with drag-and-drop page ordering.</p>
+                </div>
+                <span class="engine-tag"><i class="fa-solid fa-lock"></i> 256-Bit Encrypted Workspace</span>
+              </div>
+
+              <!-- Upload Drag & Drop Zone -->
+              <div class="dash-dropzone">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+                <div class="dropzone-title">Drag &amp; drop PDF files here, or click to select from device</div>
+                <div class="dropzone-subtitle">Supports unlimited files up to 100 MB • Multi-page page drag and reorder</div>
+                <input type="file" accept=".pdf" multiple style="position: absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:pointer;" aria-label="Upload PDF File">
+              </div>
+
+              <!-- PDF Page Reordering & Thumbnails Grid -->
+              <div class="dash-form-group">
+                <label class="dash-label">ARRANGE PAGE SEQUENCE (3 PAGES READY FOR MERGE)</label>
+                <div class="pdf-page-grid">
+                  <div class="pdf-page-card">
+                    <img src="https://labs.google.com/pomelli_downloads/websites/8uYQXSav_664FGPMIZ84IT/resources/9zhopjU_MIt6sIEd6Eq4Nb?authuser=0" alt="PDF Page 1 Preview" data-alt="Close-up clean document page thumbnail layout with organized paragraphs and chart wireframes on crisp white sheet, minimalist dark slate workspace background, shallow depth of field, no readable text.">
+                    <div class="pdf-page-actions">
+                      <span>DocA_p1.pdf</span>
+                      <div>
+                        <i class="fa-solid fa-rotate-right" style="cursor:pointer; margin-right:4px;" title="Rotate 90 deg"></i>
+                        <i class="fa-solid fa-trash-can" style="cursor:pointer; color:#EF4444;" title="Delete Page"></i>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="pdf-page-card">
+                    <img src="https://labs.google.com/pomelli_downloads/websites/8uYQXSav_664FGPMIZ84IT/resources/8fpD7yZJVC27Ve75vWJ_6f?authuser=0" alt="PDF Page 2 Preview" data-alt="Clean corporate report page thumbnail layout showing financial bar charts and structured bullet points on white paper, crisp dark workspace studio light, no text.">
+                    <div class="pdf-page-actions">
+                      <span>DocB_p1.pdf</span>
+                      <div>
+                        <i class="fa-solid fa-rotate-right" style="cursor:pointer; margin-right:4px;" title="Rotate 90 deg"></i>
+                        <i class="fa-solid fa-trash-can" style="cursor:pointer; color:#EF4444;" title="Delete Page"></i>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="pdf-page-card">
+                    <img src="https://labs.google.com/pomelli_downloads/websites/8uYQXSav_664FGPMIZ84IT/resources/a1msAqZJxGe3qqFR5Xa4sD?authuser=0" alt="PDF Page 3 Preview" data-alt="Technical documentation page thumbnail with structured diagram layout and neat headers on white paper, slate backdrop, clean minimalist lighting, no text.">
+                    <div class="pdf-page-actions">
+                      <span>DocB_p2.pdf</span>
+                      <div>
+                        <i class="fa-solid fa-rotate-right" style="cursor:pointer; margin-right:4px;" title="Rotate 90 deg"></i>
+                        <i class="fa-solid fa-trash-can" style="cursor:pointer; color:#EF4444;" title="Delete Page"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tool Options -->
+              <div class="split-editor-grid">
+                <div class="dash-form-group">
+                  <label class="dash-label">OUTPUT FILE NAME</label>
+                  <input type="text" value="ZapTools_Merged_Document.pdf" class="dash-input" aria-label="Output File Name">
+                </div>
+
+                <div class="dash-form-group">
+                  <label class="dash-label">BLANK PAGE DIVIDERS</label>
+                  <select class="dash-select" aria-label="Blank Page Dividers">
+                    <option>None (Direct Merge)</option>
+                    <option>Insert Blank Page Between Files</option>
+                    <option>Force Double-Sided Duplex Alignment</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="action-btn-bar">
+                <button type="button" class="btn-primary-action"><i class="fa-solid fa-code-merge"></i> Merge PDFs Now</button>
+                <button type="button" class="btn-accent-action"><i class="fa-solid fa-download"></i> Download Merged File</button>
+              </div>
+
+              <div class="tool-guide-card">
+                <div class="tool-guide-title"><i class="fa-solid fa-circle-info" style="color: var(--color-accent);"></i> How PDF Merging Works</div>
+                <div class="tool-steps-grid">
+                  <div class="step-item">
+                    <div class="step-num">STEP 01</div>
+                    <div class="step-heading">Upload PDFs</div>
+                    <div class="step-desc">Drag and drop two or more PDF files into the secure canvas above.</div>
+                  </div>
+                  <div class="step-item">
+                    <div class="step-num">STEP 02</div>
+                    <div class="step-heading">Reorder &amp; Rotate</div>
+                    <div class="step-desc">Arrange pages in exact sequence and rotate upside-down pages effortlessly.</div>
+                  </div>
+                  <div class="step-item">
+                    <div class="step-num">STEP 03</div>
+                    <div class="step-heading">Export Combined PDF</div>
+                    <div class="step-desc">Click Merge to instantly create a single unified PDF file directly in memory.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- PANE 4: DEDICATED TOOL PAGE - PDF SPLITTER -->
+            <div class="workspace-pane workspace-pane-pdf-split">
+              <div class="workspace-header">
+                <div class="workspace-title-group">
+                  <h2><i class="fa-solid fa-arrows-split-up-and-left" style="color: var(--color-primary);"></i> PDF Splitter Tool Page</h2>
+                  <p>Extract specific page ranges, split by page count, or separate into individual documents.</p>
+                </div>
+                <span class="engine-tag"><i class="fa-solid fa-scissors"></i> Instant Page Extraction</span>
+              </div>
+
+              <div class="dash-dropzone">
+                <i class="fa-solid fa-file-export"></i>
+                <div class="dropzone-title">Upload target PDF file to split</div>
+                <div class="dropzone-subtitle">Supports multi-page documents up to 500 pages</div>
+                <input type="file" accept=".pdf" style="position: absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:pointer;" aria-label="Upload PDF to Split">
+              </div>
+
+              <div class="split-editor-grid">
+                <div class="dash-form-group">
+                  <label class="dash-label">SPLIT MODE</label>
+                  <select class="dash-select" aria-label="Split Mode">
+                    <option>Custom Page Range (e.g. 1-3, 5, 8-10)</option>
+                    <option>Extract Every Single Page into Separate PDFs</option>
+                    <option>Split Every N Pages (Chunking)</option>
+                  </select>
+                </div>
+
+                <div class="dash-form-group">
+                  <label class="dash-label">CUSTOM RANGE SPECIFICATION</label>
+                  <input type="text" value="1-3, 5-7" class="dash-input" placeholder="e.g. 1-4, 7, 10-12" aria-label="Custom Range">
+                </div>
+              </div>
+
+              <div class="action-btn-bar">
+                <button type="button" class="btn-primary-action"><i class="fa-solid fa-scissors"></i> Extract Selected Pages</button>
+                <button type="button" class="btn-accent-action"><i class="fa-solid fa-file-zipper"></i> Download Split Zip Archive</button>
+              </div>
+
+              <div class="tool-guide-card">
+                <div class="tool-guide-title"><i class="fa-solid fa-lightbulb" style="color: var(--color-accent);"></i> Pro Split Features</div>
+                <div class="tool-steps-grid">
+                  <div class="step-item">
+                    <div class="step-num">FEATURE 01</div>
+                    <div class="step-heading">Zero Degradation</div>
+                    <div class="step-desc">Extracted pages retain original font vector paths, links, and high-res imagery.</div>
+                  </div>
+                  <div class="step-item">
+                    <div class="step-num">FEATURE 02</div>
+                    <div class="step-heading">Range Presets</div>
+                    <div class="step-desc">Quickly isolate odd/even pages or split chapter ranges with syntax commands.</div>
+                  </div>
+                  <div class="step-item">
+                    <div class="step-num">FEATURE 03</div>
+                    <div class="step-heading">Zip Packaging</div>
+                    <div class="step-desc">Multiple extracted document pages are automatically bundled into a clean Zip archive.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- PANE 5: DEDICATED TOOL PAGE - PDF COMPRESS & PROTECT -->
+            <div class="workspace-pane workspace-pane-pdf-compress">
+              <div class="workspace-header">
+                <div class="workspace-title-group">
+                  <h2><i class="fa-solid fa-file-contract" style="color: var(--color-primary);"></i> PDF Compressor &amp; Password Protect Page</h2>
+                  <p>Reduce document file sizes without losing quality and secure with AES-256 encryption.</p>
+                </div>
+                <span class="engine-tag"><i class="fa-solid fa-lock"></i> AES-256 Encryption</span>
+              </div>
+
+              <div class="dash-dropzone">
+                <i class="fa-solid fa-file-contract"></i>
+                <div class="dropzone-title">Drop PDF to compress or secure</div>
+                <div class="dropzone-subtitle">Maximum compression without visual clarity loss</div>
+                <input type="file" accept=".pdf" style="position: absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:pointer;" aria-label="Upload PDF to Compress">
+              </div>
+
+              <div class="split-editor-grid">
+                <div>
+                  <div class="dash-form-group">
+                    <label class="dash-label">COMPRESSION LEVEL</label>
+                    <select class="dash-select" aria-label="Compression Level">
+                      <option>Recommended Compression (50% reduction - High Quality)</option>
+                      <option>Extreme Compression (75% reduction - Smallest File)</option>
+                      <option>Light Compression (25% reduction - Lossless Raster)</option>
+                    </select>
+                  </div>
+
+                  <div class="dash-form-group">
+                    <label class="dash-label">TARGET DPI IMAGE DOWNSAMPLING</label>
+                    <div class="dash-slider-row">
+                      <input type="range" min="72" max="300" value="150" class="dash-slider" aria-label="Target DPI">
+                      <span class="dash-slider-val">150 DPI</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="dash-form-group">
+                    <label class="dash-label">SET DOCUMENT OPEN PASSWORD (OPTIONAL)</label>
+                    <input type="password" value="ZapToolsPass2025" class="dash-input" placeholder="Enter password to lock PDF" aria-label="Password Protect">
+                  </div>
+
+                  <div class="dash-form-group">
+                    <label class="dash-label">PERMISSIONS RESTRICTION</label>
+                    <select class="dash-select" aria-label="Permissions Restriction">
+                      <option>Allow All Actions (Default)</option>
+                      <option>Restrict Printing &amp; Copying Text</option>
+                      <option>Read Only (No Annotations Allowed)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="action-btn-bar">
+                <button type="button" class="btn-primary-action"><i class="fa-solid fa-compress"></i> Compress &amp; Secure PDF</button>
+                <button type="button" class="btn-accent-action"><i class="fa-solid fa-download"></i> Download Protected PDF</button>
+              </div>
+            </div>
+
+            <!-- PANE 6: IMAGE SUITE OVERVIEW -->
+            <div class="workspace-pane workspace-pane-image">
+              <div class="workspace-header">
+                <div class="workspace-title-group">
+                  <h2><i class="fa-solid fa-image" style="color: var(--color-accent);"></i> Image &amp; Media Suite Hub</h2>
+                  <p>Convert image formats, resize aspect ratios, adjust compression quality, and isolate backgrounds.</p>
+                </div>
+                <span class="engine-tag"><i class="fa-solid fa-wand-magic-sparkles"></i> AI Processing Ready</span>
+              </div>
+
+              <div class="workspace-grid">
+                <div class="dash-tool-card">
+                  <div>
+                    <div class="card-top-row">
+                      <div class="tool-badge-icon" style="color: var(--color-accent); background-color: rgba(16, 185, 129, 0.15);"><i class="fa-solid fa-file-image"></i></div>
+                      <span class="status-badge-live">TOOL PAGE</span>
+                    </div>
+                    <h3 class="dash-tool-title">Image Format &amp; Resizer</h3>
+                    <p class="dash-tool-desc">Convert PNG, JPG, WebP, SVG with dimensional aspect ratio presets.</p>
+                  </div>
+                  <label for="tool-image-convert" class="dash-launch-btn">Open Resizer Tool Page <i class="fa-solid fa-arrow-right"></i></label>
+                </div>
+
+                <div class="dash-tool-card">
+                  <div>
+                    <div class="card-top-row">
+                      <div class="tool-badge-icon" style="color: var(--color-accent); background-color: rgba(16, 185, 129, 0.15);"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                      <span class="status-badge-live">TOOL PAGE</span>
+                    </div>
+                    <h3 class="dash-tool-title">AI Background Remover</h3>
+                    <p class="dash-tool-desc">Automatic object threshold detection and background transparency removal.</p>
+                  </div>
+                  <label for="tool-image-bg" class="dash-launch-btn">Open BG Remover Tool Page <i class="fa-solid fa-arrow-right"></i></label>
+                </div>
+              </div>
+            </div>
+
+            <!-- PANE 7: DEDICATED TOOL PAGE - IMAGE CONVERTER & RESIZER -->
+            <div class="workspace-pane workspace-pane-image-convert">
+              <div class="workspace-header">
+                <div class="workspace-title-group">
+                  <h2><i class="fa-solid fa-file-image" style="color: var(--color-accent);"></i> Image Format Converter &amp; Resizer Page</h2>
+                  <p>Change image formats, scale resolution dimensions, crop aspect ratios, and optimize file weight.</p>
+                </div>
+                <span class="engine-tag"><i class="fa-solid fa-bolt"></i> GPU Accelerated</span>
+              </div>
+
+              <div class="dash-dropzone">
+                <i class="fa-solid fa-file-image"></i>
+                <div class="dropzone-title">Upload Image Asset (PNG, JPG, WebP, SVG, AVIF)</div>
+                <div class="dropzone-subtitle">Drop image file here to scale or convert instantly</div>
+                <input type="file" accept="image/*" style="position: absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:pointer;" aria-label="Upload Image Asset">
+              </div>
+
+              <div class="split-editor-grid">
+                <div>
+                  <div class="dash-form-group">
+                    <label class="dash-label">CANVAS PREVIEW</label>
+                    <div style="background-color:#090D16; border:1px solid rgba(255,255,255,0.1); border-radius:var(--radius-sm); padding:0.5rem; text-align:center;">
+                      <img src="https://labs.google.com/pomelli_downloads/websites/8uYQXSav_664FGPMIZ84IT/resources/8UUOTn4KGwLavu5zfPvOyq?authuser=0" alt="Image Editing Preview" data-alt="Macro close-up of vibrant color swatch grid with geometric aspect ratio measurement lines on dark slate technical surface, sleek modern design aesthetic, high contrast, no text." style="max-height:180px; width:100%; object-fit:cover; border-radius:4px;">
+                      <div style="font-family:var(--font-mono); font-size:0.7rem; color:#94A3B8; margin-top:0.4rem;">Source: 1920 x 1080 px • Format: PNG • Weight: 2.8 MB</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="dash-form-group">
+                    <label class="dash-label">TARGET RESOLUTION &amp; PRESETS</label>
+                    <div style="display:flex; gap:0.5rem; margin-bottom:0.5rem;">
+                      <input type="number" value="1280" class="dash-input" placeholder="Width" aria-label="Width">
+                      <input type="number" value="720" class="dash-input" placeholder="Height" aria-label="Height">
+                    </div>
+                    <select class="dash-select" aria-label="Resolution Presets">
+                      <option>Custom Dimension</option>
+                      <option>1080p Full HD (1920x1080)</option>
+                      <option>720p HD (1280x720)</option>
+                      <option>Social Square 1:1 (1080x1080)</option>
+                      <option>Social Portrait 4:5 (1080x1350)</option>
+                    </select>
+                  </div>
+
+                  <div class="dash-form-group">
+                    <label class="dash-label">TARGET FILE FORMAT</label>
+                    <select class="dash-select" aria-label="Target File Format">
+                      <option>WebP (Smallest File - Web Standard)</option>
+                      <option>PNG (Lossless Transparency)</option>
+                      <option>JPG (Standard Photography)</option>
+                      <option>AVIF (Next-Gen Compressed)</option>
+                    </select>
+                  </div>
+
+                  <div class="dash-form-group">
+                    <label class="dash-label">COMPRESSION QUALITY (85%)</label>
+                    <div class="dash-slider-row">
+                      <input type="range" min="10" max="100" value="85" class="dash-slider" aria-label="Quality Slider">
+                      <span class="dash-slider-val">85% Quality</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="action-btn-bar">
+                <button type="button" class="btn-primary-action"><i class="fa-solid fa-file-image"></i> Convert Format &amp; Resize</button>
+                <button type="button" class="btn-accent-action"><i class="fa-solid fa-download"></i> Download Optimized Image</button>
+              </div>
+
+              <div class="tool-guide-card">
+                <div class="tool-guide-title"><i class="fa-solid fa-circle-check" style="color: var(--color-accent);"></i> Supported Transformations</div>
+                <div class="tool-steps-grid">
+                  <div class="step-item">
+                    <div class="step-num">STEP 01</div>
+                    <div class="step-heading">Format Conversion</div>
+                    <div class="step-desc">Convert heavy PNGs into web-ready WebP or AVIF formats instantly.</div>
+                  </div>
+                  <div class="step-item">
+                    <div class="step-num">STEP 02</div>
+                    <div class="step-heading">Aspect Ratio Scaling</div>
+                    <div class="step-desc">Lock aspect ratios to prevent image stretching during resizing operations.</div>
+                  </div>
+                  <div class="step-item">
+                    <div class="step-num">STEP 03</div>
+                    <div class="step-heading">Quality Optimization</div>
+                    <div class="step-desc">Fine-tune compression quality sliders to hit exact KB target limits.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- PANE 8: DEDICATED TOOL PAGE - AI BACKGROUND REMOVER -->
+            <div class="workspace-pane workspace-pane-image-bg">
+              <div class="workspace-header">
+                <div class="workspace-title-group">
+                  <h2><i class="fa-solid fa-wand-magic-sparkles" style="color: var(--color-accent);"></i> AI Background Remover Tool Page</h2>
+                  <p>Isolate foreground subjects and create clean transparent PNG graphics automatically.</p>
+                </div>
+                <span class="engine-tag"><i class="fa-solid fa-robot"></i> Machine Vision Neural Model</span>
+              </div>
+
+              <div class="dash-dropzone">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                <div class="dropzone-title">Upload photo to isolate background</div>
+                <div class="dropzone-subtitle">Best results with product shots, portrait headshots, and graphics</div>
+                <input type="file" accept="image/*" style="position: absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:pointer;" aria-label="Upload Image for BG Removal">
+              </div>
+
+              <div class="split-editor-grid">
+                <div>
+                  <div class="dash-form-group">
+                    <label class="dash-label">ISOLATION RESULT PREVIEW</label>
+                    <div style="background-color:#090D16; border:1px solid rgba(255,255,255,0.1); border-radius:var(--radius-sm); padding:0.5rem; text-align:center;">
+                      <img src="https://labs.google.com/pomelli_downloads/websites/8uYQXSav_664FGPMIZ84IT/resources/8UUOTn4KGwLavu5zfPvOyq?authuser=0" alt="Background Removed Preview" data-alt="Macro close-up of vibrant color swatch grid with geometric aspect ratio measurement lines on dark slate technical surface, sleek modern design aesthetic, high contrast, no text." style="max-height:180px; width:100%; object-fit:cover; border-radius:4px;">
+                      <div style="font-family:var(--font-mono); font-size:0.7rem; color:var(--color-accent); margin-top:0.4rem;"><i class="fa-solid fa-check"></i> Subject Isolated • Alpha Channel Active</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="dash-form-group">
+                    <label class="dash-label">BACKGROUND FILL MODE</label>
+                    <select class="dash-select" aria-label="Background Fill Mode">
+                      <option>Transparent (Alpha Channel PNG)</option>
+                      <option>Solid Dark (#0F172A)</option>
+                      <option>Solid White (#FFFFFF)</option>
+                      <option>Blurred Background Effect</option>
+                    </select>
+                  </div>
+
+                  <div class="dash-form-group">
+                    <label class="dash-label">EDGE SMOOTHING FEATHERING (12PX)</label>
+                    <div class="dash-slider-row">
+                      <input type="range" min="0" max="30" value="12" class="dash-slider" aria-label="Feathering Slider">
+                      <span class="dash-slider-val">12 px</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="action-btn-bar">
+                <button type="button" class="btn-primary-action"><i class="fa-solid fa-wand-magic-sparkles"></i> Process Background Removal</button>
+                <button type="button" class="btn-accent-action"><i class="fa-solid fa-download"></i> Download Transparent PNG</button>
+              </div>
+            </div>
+
+            <!-- PANE 9: DEVELOPER SUITE OVERVIEW -->
+            <div class="workspace-pane workspace-pane-dev">
+              <div class="workspace-header">
+                <div class="workspace-title-group">
+                  <h2><i class="fa-solid fa-code" style="color: var(--color-primary);"></i> Developer Utilities Suite Hub</h2>
+                  <p>Encoding, formatting, decoding, cryptographic hashing, and syntax verification micro-tools.</p>
+                </div>
+                <span class="engine-tag"><i class="fa-solid fa-terminal"></i> Engineer Workspace</span>
+              </div>
+
+              <div class="workspace-grid">
+                <div class="dash-tool-card">
+                  <div>
+                    <div class="card-top-row">
+                      <div class="tool-badge-icon"><i class="fa-solid fa-code"></i></div>
+                      <span class="status-badge-live">TOOL PAGE</span>
+                    </div>
+                    <h3 class="dash-tool-title">JSON Formatter &amp; Validator</h3>
+                    <p class="dash-tool-desc">Beautify JSON, validate payload syntax, and minify code blocks.</p>
+                  </div>
+                  <label for="tool-dev-json" class="dash-launch-btn">Open JSON Tool Page <i class="fa-solid fa-arrow-right"></i></label>
+                </div>
+
+                <div class="dash-tool-card">
+                  <div>
+                    <div class="card-top-row">
+                      <div class="tool-badge-icon"><i class="fa-solid fa-key"></i></div>
+                      <span class="status-badge-live">TOOL PAGE</span>
+                    </div>
+                    <h3 class="dash-tool-title">JWT Decoder &amp; Debugger</h3>
+                    <p class="dash-tool-desc">Decode JWT tokens, inspect claims, signature headers, and token expiry.</p>
+                  </div>
+                  <label for="tool-dev-jwt" class="dash-launch-btn">Open JWT Tool Page <i class="fa-solid fa-arrow-right"></i></label>
+                </div>
+
+                <div class="dash-tool-card">
+                  <div>
+                    <div class="card-top-row">
+                      <div class="tool-badge-icon"><i class="fa-solid fa-binary"></i></div>
+                      <span class="status-badge-live">TOOL PAGE</span>
+                    </div>
+                    <h3 class="dash-tool-title">Base64 Encoder / Decoder</h3>
+                    <p class="dash-tool-desc">Convert plain text strings or image assets to Base64 URI representations.</p>
+                  </div>
+                  <label for="tool-dev-base64" class="dash-launch-btn">Open Base64 Tool Page <i class="fa-solid fa-arrow-right"></i></label>
+                </div>
+
+                <div class="dash-tool-card">
+                  <div>
+                    <div class="card-top-row">
+                      <div class="tool-badge-icon"><i class="fa-solid fa-hashtag"></i></div>
+                      <span class="status-badge-live">TOOL PAGE</span>
+                    </div>
+                    <h3 class="dash-tool-title">Hash &amp; UUID Generator</h3>
+                    <p class="dash-tool-desc">Generate MD5, SHA-256, SHA-512 hashes and bulk UUID v4 identifiers.</p>
+                  </div>
+                  <label for="tool-dev-hash" class="dash-launch-btn">Open Hash Tool Page <i class="fa-solid fa-arrow-right"></i></label>
+                </div>
+              </div>
+            </div>
+
+            <!-- PANE 10: DEDICATED TOOL PAGE - JSON FORMATTER -->
+            <div class="workspace-pane workspace-pane-dev-json">
+              <div class="workspace-header">
+                <div class="workspace-title-group">
+                  <h2><i class="fa-solid fa-code" style="color: var(--color-primary);"></i> JSON Formatter &amp; Validator Tool Page</h2>
+                  <p>Format raw JSON strings into clean readable structures, validate syntax errors, and minify payloads.</p>
+                </div>
+                <span class="engine-tag"><i class="fa-solid fa-check"></i> Real-Time Syntax Parser</span>
+              </div>
+
+              <div class="split-editor-grid">
+                <div>
+                  <div class="dash-form-group">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+                      <label class="dash-label" style="margin-bottom:0;">RAW INPUT PAYLOAD</label>
+                      <span style="font-family:var(--font-mono); font-size:0.7rem; color:var(--color-accent); cursor:pointer;">[ Clear Text ]</span>
+                    </div>
+                    <textarea class="dash-textarea" rows="12" aria-label="Raw Input JSON">{
+  "service": "ZapToolsCanvas",
+  "version": "2.4.0",
+  "modules": ["pdf", "image", "developer", "converters"],
+  "active": true,
+  "config": {
+    "maxSize": 104857600,
+    "encryption": "AES-256"
+  }
+}</textarea>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="dash-form-group">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+                      <label class="dash-label" style="margin-bottom:0;">BEAUTIFIED OUTPUT</label>
+                      <span style="font-family:var(--font-mono); font-size:0.7rem; color:var(--color-accent);"><i class="fa-solid fa-circle-check"></i> Valid JSON</span>
+                    </div>
+                    <div class="code-output-box"><span class="code-key">"service"</span>: <span class="code-str">"ZapToolsCanvas"</span>,
+<span class="code-key">"version"</span>: <span class="code-str">"2.4.0"</span>,
+<span class="code-key">"modules"</span>: [
+  <span class="code-str">"pdf"</span>,
+  <span class="code-str">"image"</span>,
+  <span class="code-str">"developer"</span>,
+  <span class="code-str">"converters"</span>
+],
+<span class="code-key">"active"</span>: <span class="code-bool">true</span>,
+<span class="code-key">"config"</span>: {
+  <span class="code-key">"maxSize"</span>: <span class="code-num">104857600</span>,
+  <span class="code-key">"encryption"</span>: <span class="code-str">"AES-256"</span>
+}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="action-btn-bar">
+                <button type="button" class="btn-primary-action"><i class="fa-solid fa-code"></i> Format / Beautify</button>
+                <button type="button" class="btn-secondary-action"><i class="fa-solid fa-compress"></i> Minify JSON</button>
+                <button type="button" class="btn-accent-action"><i class="fa-solid fa-copy"></i> Copy Clean JSON</button>
+              </div>
+
+              <div class="tool-guide-card">
+                <div class="tool-guide-title"><i class="fa-solid fa-terminal" style="color: var(--color-primary);"></i> JSON Tool Capabilities</div>
+                <div class="tool-steps-grid">
+                  <div class="step-item">
+                    <div class="step-num">FEATURE 01</div>
+                    <div class="step-heading">Strict Validation</div>
+                    <div class="step-desc">Identifies missing quotes, hanging commas, or unescaped characters with exact line numbers.</div>
+                  </div>
+                  <div class="step-item">
+                    <div class="step-num">FEATURE 02</div>
+                    <div class="step-heading">Key Sorting</div>
+                    <div class="step-desc">Alphabetize JSON keys recursively for clean Git diff comparisons.</div>
+                  </div>
+                  <div class="step-item">
+                    <div class="step-num">FEATURE 03</div>
+                    <div class="step-heading">Minification</div>
+                    <div class="step-desc">Compress JSON payloads to single-line strings for optimized API transmission.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- PANE 11: DEDICATED TOOL PAGE - JWT DECODER -->
+            <div class="workspace-pane workspace-pane-dev-jwt">
+              <div class="workspace-header">
+                <div class="workspace-title-group">
+                  <h2><i class="fa-solid fa-key" style="color: var(--color-primary);"></i> JWT Decoder &amp; Debugger Tool Page</h2>
+                  <p>Decode JSON Web Token headers, payload claims, and verify token cryptographic signatures.</p>
+                </div>
+                <span class="engine-tag"><i class="fa-solid fa-shield-halved"></i> HS256 / RS256 Parser</span>
+              </div>
+
+              <div class="dash-form-group">
+                <label class="dash-label">ENCODED JWT TOKEN STRING</label>
+                <textarea class="dash-textarea" rows="3" aria-label="Encoded JWT String">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJ6YXB0b29scy5jb20iLCJzdWIiOiJ1c3JfOTgyMzQxIiwicm9sZSI6ImRldmVsb3BlciIsImlhdCI6MTcwMDAwMDAwMCwiZXhwIjoyMTAwMDAwMDAwfQ.signature_hash_preview</textarea>
+              </div>
+
+              <div class="split-editor-grid">
+                <div>
+                  <div class="dash-form-group">
+                    <label class="dash-label">DECODED HEADER (ALGORITHM &amp; TYPE)</label>
+                    <div class="code-output-box">{
+  <span class="code-key">"alg"</span>: <span class="code-str">"HS256"</span>,
+  <span class="code-key">"typ"</span>: <span class="code-str">"JWT"</span>
+}</div>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="dash-form-group">
+                    <label class="dash-label">DECODED PAYLOAD (CLAIMS &amp; DATA)</label>
+                    <div class="code-output-box">{
+  <span class="code-key">"iss"</span>: <span class="code-str">"zaptools.com"</span>,
+  <span class="code-key">"sub"</span>: <span class="code-str">"usr_982341"</span>,
+  <span class="code-key">"role"</span>: <span class="code-str">"developer"</span>,
+  <span class="code-key">"iat"</span>: <span class="code-num">1700000000</span>,
+  <span class="code-key">"exp"</span>: <span class="code-num">2100000000</span>
+}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div style="background-color:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.3); border-radius:var(--radius-sm); padding:0.85rem; font-family:var(--font-mono); font-size:0.8125rem; color:var(--color-accent); display:flex; align-items:center; gap:0.6rem; margin-top:1rem;">
+                <i class="fa-solid fa-circle-check" style="font-size:1.1rem;"></i>
+                <span>Signature Verified • Token active and valid (Expiration epoch: 2100000000)</span>
+              </div>
+
+              <div class="action-btn-bar">
+                <button type="button" class="btn-primary-action"><i class="fa-solid fa-key"></i> Decode JWT Token</button>
+                <button type="button" class="btn-accent-action"><i class="fa-solid fa-copy"></i> Copy Payload JSON</button>
+              </div>
+            </div>
+
+            <!-- PANE 12: DEDICATED TOOL PAGE - BASE64 ENCODER -->
+            <div class="workspace-pane workspace-pane-dev-base64">
+              <div class="workspace-header">
+                <div class="workspace-title-group">
+                  <h2><i class="fa-solid fa-binary" style="color: var(--color-primary);"></i> Base64 Encoder / Decoder Page</h2>
+                  <p>Encode plain text or assets to Base64 data strings or decode Base64 back to readable text.</p>
+                </div>
+                <span class="engine-tag"><i class="fa-solid fa-binary"></i> UTF-8 / Binary Encoding</span>
+              </div>
+
+              <div class="split-editor-grid">
+                <div>
+                  <div class="dash-form-group">
+                    <label class="dash-label">PLAIN TEXT INPUT</label>
+                    <textarea class="dash-textarea" rows="8" placeholder="Type or paste plain text here..." aria-label="Plain Text Input">ZapToolsCanvas Micro-SaaS Platform</textarea>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="dash-form-group">
+                    <label class="dash-label">BASE64 ENCODED OUTPUT</label>
+                    <textarea class="dash-textarea" rows="8" readonly style="color:var(--color-accent);" aria-label="Base64 Output">WmFwVG9vbHNDYW52YXMgTWljcm8tU2FhUyBQbGF0Zm9ybQ==</textarea>
+                  </div>
+                </div>
+              </div>
+
+              <div class="action-btn-bar">
+                <button type="button" class="btn-primary-action"><i class="fa-solid fa-arrow-right-arrow-left"></i> Encode to Base64</button>
+                <button type="button" class="btn-secondary-action"><i class="fa-solid fa-arrow-rotate-left"></i> Decode to Text</button>
+                <button type="button" class="btn-accent-action"><i class="fa-solid fa-copy"></i> Copy Base64 String</button>
+              </div>
+            </div>
+
+            <!-- PANE 13: DEDICATED TOOL PAGE - HASH & UUID GENERATOR -->
+            <div class="workspace-pane workspace-pane-dev-hash">
+              <div class="workspace-header">
+                <div class="workspace-title-group">
+                  <h2><i class="fa-solid fa-hashtag" style="color: var(--color-primary);"></i> Cryptographic Hash &amp; UUID Generator</h2>
+                  <p>Generate MD5, SHA-1, SHA-256, SHA-512 cryptographic digests and RFC-compliant UUID v4 IDs.</p>
+                </div>
+                <span class="engine-tag"><i class="fa-solid fa-fingerprint"></i> Crypto Standard</span>
+              </div>
+
+              <div class="dash-form-group">
+                <label class="dash-label">INPUT STRING FOR CRYPTOGRAPHIC HASHING</label>
+                <input type="text" value="ZapToolsCanvas-Secure-Payload-2025" class="dash-input" aria-label="Input Hash String">
+              </div>
+
+              <div class="dash-form-group">
+                <label class="dash-label">GENERATED HASH DIGESTS</label>
+                <div class="hash-result-row">
+                  <span class="hash-label">MD5</span>
+                  <span class="hash-val">e10adc3949ba59abbe56e057f20f883e</span>
+                  <span class="hash-copy"><i class="fa-solid fa-copy"></i></span>
+                </div>
+                <div class="hash-result-row">
+                  <span class="hash-label">SHA-1</span>
+                  <span class="hash-val">2fd4e1c67a2d28fced849ee1bb76e7391b93eb12</span>
+                  <span class="hash-copy"><i class="fa-solid fa-copy"></i></span>
+                </div>
+                <div class="hash-result-row">
+                  <span class="hash-label">SHA-256</span>
+                  <span class="hash-val">d7a8fbb307d7809469ca9ab5d0ed3248b92a8000783110292790b9b3290...</span>
+                  <span class="hash-copy"><i class="fa-solid fa-copy"></i></span>
+                </div>
+              </div>
+
+              <div class="dash-form-group" style="margin-top:1.5rem;">
+                <label class="dash-label">BULK UUID V4 GENERATOR</label>
+                <div class="code-output-box" style="min-height:110px;">f47ac10b-58cc-4372-a567-0e02b2c3d479
+9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d
+a1b2c3d4-e5f6-4789-8012-3456789abcde</div>
+              </div>
+
+              <div class="action-btn-bar">
+                <button type="button" class="btn-primary-action"><i class="fa-solid fa-rotate"></i> Generate New UUIDs</button>
+                <button type="button" class="btn-accent-action"><i class="fa-solid fa-copy"></i> Copy All Hashes</button>
+              </div>
+            </div>
+
+            <!-- PANE 14: TEXT SUITE OVERVIEW -->
+            <div class="workspace-pane workspace-pane-text">
+              <div class="workspace-header">
+                <div class="workspace-title-group">
+                  <h2><i class="fa-solid fa-font" style="color: var(--color-accent);"></i> Text &amp; Data Suite Hub</h2>
+                  <p>Word counters, case transformers, find-and-replace string utilities, and duplicate filters.</p>
+                </div>
+              </div>
+
+              <div class="workspace-grid">
+                <div class="dash-tool-card">
+                  <div>
+                    <div class="card-top-row">
+                      <div class="tool-badge-icon" style="color: var(--color-accent); background-color: rgba(16, 185, 129, 0.15);"><i class="fa-solid fa-font"></i></div>
+                      <span class="status-badge-live">TOOL PAGE</span>
+                    </div>
+                    <h3 class="dash-tool-title">Word Counter &amp; Cases</h3>
+                    <p class="dash-tool-desc">Live text metrics, character counts, reading speeds, and case transformations.</p>
+                  </div>
+                  <label for="tool-text-counter" class="dash-launch-btn">Open Word Counter Page <i class="fa-solid fa-arrow-right"></i></label>
+                </div>
+              </div>
+            </div>
+
+            <!-- PANE 15: DEDICATED TOOL PAGE - WORD COUNTER & CASE TRANSFORMER -->
+            <div class="workspace-pane workspace-pane-text-counter">
+              <div class="workspace-header">
+                <div class="workspace-title-group">
+                  <h2><i class="fa-solid fa-font" style="color: var(--color-accent);"></i> Word Counter &amp; Case Transformer Page</h2>
+                  <p>Real-time sentence metrics, word frequency analysis, and case string transformation tools.</p>
+                </div>
+                <span class="engine-tag"><i class="fa-solid fa-clock"></i> Live Statistics Engine</span>
+              </div>
+
+              <!-- Text Metrics Cards -->
+              <div class="text-metrics-grid">
+                <div class="metric-card">
+                  <div class="metric-val">142</div>
+                  <div class="metric-label">Words</div>
+                </div>
+                <div class="metric-card">
+                  <div class="metric-val">890</div>
+                  <div class="metric-label">Characters</div>
+                </div>
+                <div class="metric-card">
+                  <div class="metric-val">12</div>
+                  <div class="metric-label">Sentences</div>
+                </div>
+                <div class="metric-card">
+                  <div class="metric-val">0.6 min</div>
+                  <div class="metric-label">Read Time</div>
+                </div>
+              </div>
+
+              <div class="dash-form-group">
+                <label class="dash-label">INPUT TEXT CONTENT</label>
+                <textarea class="dash-textarea" rows="8" aria-label="Input Text Content">ZapToolsCanvas is an all-in-one Micro-SaaS platform offering document converters, developer utilities, text manipulation, and media tools. It serves students, office workers, developers, and professionals by providing versatile tools and workflows to help users execute tasks effortlessly.</textarea>
+              </div>
+
+              <div class="split-editor-grid">
+                <div class="dash-form-group">
+                  <label class="dash-label">FIND TEXT</label>
+                  <input type="text" value="Micro-SaaS" class="dash-input" aria-label="Find Text">
+                </div>
+                <div class="dash-form-group">
+                  <label class="dash-label">REPLACE WITH</label>
+                  <input type="text" value="SaaS Platform" class="dash-input" aria-label="Replace Text">
+                </div>
+              </div>
+
+              <div class="action-btn-bar">
+                <button type="button" class="btn-primary-action"><i class="fa-solid fa-text-height"></i> UPPERCASE</button>
+                <button type="button" class="btn-secondary-action"><i class="fa-solid fa-font"></i> Title Case</button>
+                <button type="button" class="btn-secondary-action"><i class="fa-solid fa-link"></i> slugify-text</button>
+                <button type="button" class="btn-accent-action"><i class="fa-solid fa-magnifying-glass-arrow-right"></i> Apply Find &amp; Replace</button>
+              </div>
+            </div>
+
+            <!-- PANE 16: CONVERTERS SUITE OVERVIEW -->
+            <div class="workspace-pane workspace-pane-converter">
+              <div class="workspace-header">
+                <div class="workspace-title-group">
+                  <h2><i class="fa-solid fa-arrow-right-arrow-left" style="color: var(--color-primary);"></i> File Converters Suite Hub</h2>
+                  <p>Convert data formats between CSV, JSON, XML, and YAML structures seamlessly.</p>
+                </div>
+              </div>
+
+              <div class="workspace-grid">
+                <div class="dash-tool-card">
+                  <div>
+                    <div class="card-top-row">
+                      <div class="tool-badge-icon"><i class="fa-solid fa-file-csv"></i></div>
+                      <span class="status-badge-live">TOOL PAGE</span>
+                    </div>
+                    <h3 class="dash-tool-title">CSV ↔ JSON Data Converter</h3>
+                    <p class="dash-tool-desc">Parse CSV tables into clean JSON objects and vice versa.</p>
+                  </div>
+                  <label for="tool-converter-csv" class="dash-launch-btn">Open Converter Tool Page <i class="fa-solid fa-arrow-right"></i></label>
+                </div>
+              </div>
+            </div>
+
+            <!-- PANE 17: DEDICATED TOOL PAGE - CSV TO JSON CONVERTER -->
+            <div class="workspace-pane workspace-pane-converter-csv">
+              <div class="workspace-header">
+                <div class="workspace-title-group">
+                  <h2><i class="fa-solid fa-file-csv" style="color: var(--color-primary);"></i> CSV ↔ JSON Data Converter Page</h2>
+                  <p>Parse raw tabular CSV data into structured JSON objects or export JSON arrays to CSV spreadsheets.</p>
+                </div>
+                <span class="engine-tag"><i class="fa-solid fa-table"></i> Delimiter Configurable</span>
+              </div>
+
+              <div class="split-editor-grid">
+                <div class="dash-form-group">
+                  <label class="dash-label">INPUT CSV SPREADSHEET DATA</label>
+                  <textarea class="dash-textarea" rows="10" aria-label="Input CSV Data">id,name,role,department,salary
+101,Sarah Chen,Senior Engineer,Platform,145000
+102,Marcus Vance,Product Designer,UX Studio,128000
+103,Elena Rostova,DevOps Lead,Infrastructure,152000</textarea>
+                </div>
+
+                <div class="dash-form-group">
+                  <label class="dash-label">CONVERTED JSON ARRAY OUTPUT</label>
+                  <div class="code-output-box">[
+  { <span class="code-key">"id"</span>: <span class="code-num">101</span>, <span class="code-key">"name"</span>: <span class="code-str">"Sarah Chen"</span>, <span class="code-key">"role"</span>: <span class="code-str">"Senior Engineer"</span> },
+  { <span class="code-key">"id"</span>: <span class="code-num">102</span>, <span class="code-key">"name"</span>: <span class="code-str">"Marcus Vance"</span>, <span class="code-key">"role"</span>: <span class="code-str">"Product Designer"</span> },
+  { <span class="code-key">"id"</span>: <span class="code-num">103</span>, <span class="code-key">"name"</span>: <span class="code-str">"Elena Rostova"</span>, <span class="code-key">"role"</span>: <span class="code-str">"DevOps Lead"</span> }
+]</div>
+                </div>
+              </div>
+
+              <div class="action-btn-bar">
+                <button type="button" class="btn-primary-action"><i class="fa-solid fa-file-code"></i> Convert CSV to JSON</button>
+                <button type="button" class="btn-secondary-action"><i class="fa-solid fa-arrow-rotate-left"></i> Swap Direction (JSON to CSV)</button>
+                <button type="button" class="btn-accent-action"><i class="fa-solid fa-download"></i> Export Converted File</button>
+              </div>
+            </div>
+
+            <!-- PANE 18: CALCULATORS SUITE OVERVIEW -->
+            <div class="workspace-pane workspace-pane-calculator">
+              <div class="workspace-header">
+                <div class="workspace-title-group">
+                  <h2><i class="fa-solid fa-calculator" style="color: var(--color-accent);"></i> Business Calculators Suite Hub</h2>
+                  <p>Financial ROI, margin analysis, SaaS unit economics, and growth forecasting models.</p>
+                </div>
+              </div>
+
+              <div class="workspace-grid">
+                <div class="dash-tool-card">
+                  <div>
+                    <div class="card-top-row">
+                      <div class="tool-badge-icon" style="color: var(--color-accent); background-color: rgba(16, 185, 129, 0.15);"><i class="fa-solid fa-calculator"></i></div>
+                      <span class="status-badge-live">TOOL PAGE</span>
+                    </div>
+                    <h3 class="dash-tool-title">SaaS ROI Calculator</h3>
+                    <p class="dash-tool-desc">Calculate ROI percentages, profit payback periods, and revenue projections.</p>
+                  </div>
+                  <label for="tool-calculator-roi" class="dash-launch-btn">Open SaaS ROI Calculator <i class="fa-solid fa-arrow-right"></i></label>
+                </div>
+              </div>
+            </div>
+
+            <!-- PANE 19: DEDICATED TOOL PAGE - SAAS ROI CALCULATOR -->
+            <div class="workspace-pane workspace-pane-calculator-roi">
+              <div class="workspace-header">
+                <div class="workspace-title-group">
+                  <h2><i class="fa-solid fa-calculator" style="color: var(--color-accent);"></i> SaaS ROI &amp; Financial Growth Calculator Page</h2>
+                  <p>Interactive revenue projections, payback period analysis, and profit margin breakdown.</p>
+                </div>
+                <span class="engine-tag"><i class="fa-solid fa-chart-line"></i> Financial Model Active</span>
+              </div>
+
+              <div class="split-editor-grid">
+                <div>
+                  <div class="dash-form-group">
+                    <label class="dash-label">INITIAL PLATFORM INVESTMENT ($)</label>
+                    <input type="number" value="12000" class="dash-input" aria-label="Initial Investment">
+                  </div>
+                  <div class="dash-form-group">
+                    <label class="dash-label">ESTIMATED MONTHLY REVENUE ($)</label>
+                    <input type="number" value="8500" class="dash-input" aria-label="Monthly Revenue">
+                  </div>
+                  <div class="dash-form-group">
+                    <label class="dash-label">MONTHLY OPERATING COSTS ($)</label>
+                    <input type="number" value="2200" class="dash-input" aria-label="Monthly Operating Costs">
+                  </div>
+                </div>
+
+                <div>
+                  <div class="text-metrics-grid" style="grid-template-columns: 1fr 1fr; margin-bottom:1rem;">
+                    <div class="metric-card">
+                      <div class="metric-val" style="color:#60A5FA;">$75,600</div>
+                      <div class="metric-label">12-Mo Net Revenue</div>
+                    </div>
+                    <div class="metric-card">
+                      <div class="metric-val">+530%</div>
+                      <div class="metric-label">Estimated ROI</div>
+                    </div>
+                  </div>
+
+                  <label class="dash-label">FINANCIAL SPLIT RATIO (COST VS PROFIT)</label>
+                  <div class="calc-ratio-bar">
+                    <div class="calc-seg-1" title="Investment"></div>
+                    <div class="calc-seg-2" title="Operating Costs"></div>
+                    <div class="calc-seg-3" title="Net Profit Margin"></div>
+                  </div>
+                  <div style="font-family:var(--font-mono); font-size:0.75rem; color:#94A3B8; display:flex; justify-content:space-between;">
+                    <span><i class="fa-solid fa-circle" style="color:var(--color-primary); font-size:0.6rem;"></i> Investment</span>
+                    <span><i class="fa-solid fa-circle" style="color:#F59E0B; font-size:0.6rem;"></i> Costs</span>
+                    <span><i class="fa-solid fa-circle" style="color:var(--color-accent); font-size:0.6rem;"></i> Net Profit (60%)</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="action-btn-bar">
+                <button type="button" class="btn-primary-action"><i class="fa-solid fa-chart-pie"></i> Calculate Metrics</button>
+                <button type="button" class="btn-accent-action"><i class="fa-solid fa-download"></i> Export Financial Report</button>
+              </div>
+            </div>
+
+          </main>
+
+          <!-- Right Side Tools & Inspector Panel -->
+          <aside class="dash-right-panel">
+            <div class="panel-header">
+              <span class="panel-title">Tool Inspector</span>
+              <label for="toggle-right-panel" class="panel-collapse-label" title="Collapse Panel"><i class="fa-solid fa-sidebar"></i></label>
+            </div>
+
+            <div>
+              <div class="sidebar-group-title">Engine Status</div>
+              <div class="right-panel-item">
+                <div class="item-top">
+                  <span class="file-name"><i class="fa-solid fa-shield-halved" style="color:var(--color-accent);"></i> Privacy Mode</span>
+                  <span class="time-tag">ACTIVE</span>
+                </div>
+                <p style="color:#94A3B8; font-size:0.75rem;">100% Client-side execution in local browser memory. No data sent to servers.</p>
+              </div>
+            </div>
+
+            <div>
+              <div class="sidebar-group-title">Recent Files &amp; History</div>
+              <div style="display:flex; flex-direction:column; gap:0.5rem;">
+                <div class="right-panel-item">
+                  <div class="item-top">
+                    <span class="file-name"><i class="fa-solid fa-file-pdf" style="color:var(--color-primary);"></i> report_final.pdf</span>
+                    <span class="time-tag">2m ago</span>
+                  </div>
+                  <span style="color:#94A3B8; font-size:0.7rem;">Merged &amp; Compressed (-48%)</span>
+                </div>
+
+                <div class="right-panel-item">
+                  <div class="item-top">
+                    <span class="file-name"><i class="fa-solid fa-image" style="color:var(--color-accent);"></i> banner_hero.webp</span>
+                    <span class="time-tag">12m ago</span>
+                  </div>
+                  <span style="color:#94A3B8; font-size:0.7rem;">Resized to 1280x720</span>
+                </div>
+
+                <div class="right-panel-item">
+                  <div class="item-top">
+                    <span class="file-name"><i class="fa-solid fa-file-code" style="color:#60A5FA;"></i> schema_data.json</span>
+                    <span class="time-tag">1h ago</span>
+                  </div>
+                  <span style="color:#94A3B8; font-size:0.7rem;">Validated &amp; Formatted</span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div class="sidebar-group-title">Workspace Settings</div>
+              <div class="dash-form-group">
+                <label class="dash-label">DEFAULT OUTPUT QUALITY</label>
+                <select class="dash-select" style="padding:0.4rem;" aria-label="Default Output Quality">
+                  <option>High Quality (Default)</option>
+                  <option>Maximum Compression</option>
+                  <option>Lossless Original</option>
+                </select>
+              </div>
+            </div>
+          </aside>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand-title">
+            <i class="fa-solid fa-layer-group"></i>
+            ZapToolsCanvas
+          </div>
+          <p class="footer-overview">
+            An all-in-one Micro-SaaS platform offering document converters, developer utilities, text manipulation, and media tools. Serves students, office workers, developers, and professionals.
+          </p>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title">Core Values</h4>
+          <ul class="footer-list">
+            <li>Efficiency</li>
+            <li>Accessibility</li>
+            <li>Collaboration</li>
+            <li>Practicality</li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title">Target Users</h4>
+          <ul class="footer-list">
+            <li>Students</li>
+            <li>Office Workers</li>
+            <li>Developers</li>
+            <li>Professionals</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>ZapToolsCanvas. All rights reserved.</div>
+        <div>Modern Utilitarian • Micro-SaaS Platform</div>
+      </div>
+    </div>
+  </footer>
+
+<div style="text-align:right;padding:16px"><a href="https://support.google.com/legal/answer/3110420" target="_blank" style="color:inherit;text-decoration:none;font-size:12px">Report legal issue</a></div><style>
+body { position: relative; }
+div.ai-image-badge {
+  position: absolute;
+  width: 25px;
+  height: 25px;
+  background-image: url("data:image/svg+xml,%3Csvg%20width%3D%2225%22%20height%3D%2225%22%20viewBox%3D%220%200%2025%2025%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Cg%3E%0A%3Cmask%20id%3D%22path-2-inside-1_4816_19485%22%20fill%3D%22white%22%3E%0A%3Cpath%20d%3D%22M17.9651%2010.7604L16.8609%208.36458L14.4651%207.28125L16.8609%206.17708L17.9651%203.78125L19.0484%206.17708L21.4442%207.28125L19.0484%208.36458L17.9651%2010.7604ZM17.9651%2021.7604L16.8817%2019.3437L14.4651%2018.2604L16.8817%2017.1771L17.9651%2014.7604L19.0484%2017.1771L21.4651%2018.2604L19.0484%2019.3437L17.9651%2021.7604ZM10.9651%2019.2604L8.94423%2014.7812L4.46506%2012.7604L8.94423%2010.7396L10.9651%206.26042L12.9859%2010.7396L17.4651%2012.7604L12.9859%2014.7812L10.9651%2019.2604Z%22%2F%3E%0A%3C%2Fmask%3E%0A%3Cpath%20d%3D%22M17.9651%2010.7604L16.8609%208.36458L14.4651%207.28125L16.8609%206.17708L17.9651%203.78125L19.0484%206.17708L21.4442%207.28125L19.0484%208.36458L17.9651%2010.7604ZM17.9651%2021.7604L16.8817%2019.3437L14.4651%2018.2604L16.8817%2017.1771L17.9651%2014.7604L19.0484%2017.1771L21.4651%2018.2604L19.0484%2019.3437L17.9651%2021.7604ZM10.9651%2019.2604L8.94423%2014.7812L4.46506%2012.7604L8.94423%2010.7396L10.9651%206.26042L12.9859%2010.7396L17.4651%2012.7604L12.9859%2014.7812L10.9651%2019.2604Z%22%20fill%3D%22white%22%2F%3E%0A%3Cpath%20d%3D%22M17.9651%2010.7604L17.511%2010.9697L17.9694%2011.9644L18.4206%2010.9664L17.9651%2010.7604ZM16.8609%208.36458L17.315%208.1553L17.2369%207.98586L17.0669%207.90899L16.8609%208.36458ZM14.4651%207.28125L14.2558%206.82715L13.2611%207.28558L14.2591%207.73684L14.4651%207.28125ZM16.8609%206.17708L17.0702%206.63118L17.2378%206.55394L17.315%206.38636L16.8609%206.17708ZM17.9651%203.78125L18.4206%203.57524L17.9694%202.57727L17.511%203.57197L17.9651%203.78125ZM19.0484%206.17708L18.5928%206.38309L18.6697%206.55309L18.8391%206.63118L19.0484%206.17708ZM21.4442%207.28125L21.6502%207.73684L22.6482%207.28558L21.6535%206.82715L21.4442%207.28125ZM19.0484%208.36458L18.8424%207.90899L18.6705%207.98671L18.5928%208.15858L19.0484%208.36458ZM17.9651%2021.7604L17.5088%2021.9649L17.9651%2022.9827L18.4213%2021.9649L17.9651%2021.7604ZM16.8817%2019.3438L17.338%2019.1392L17.2601%2018.9654L17.0863%2018.8875L16.8817%2019.3438ZM14.4651%2018.2604L14.2605%2017.8042L13.2427%2018.2604L14.2605%2018.7167L14.4651%2018.2604ZM16.8817%2017.1771L17.0863%2017.6333L17.2601%2017.5554L17.338%2017.3816L16.8817%2017.1771ZM17.9651%2014.7604L18.4213%2014.5559L17.9651%2013.5381L17.5088%2014.5559L17.9651%2014.7604ZM19.0484%2017.1771L18.5921%2017.3816L18.6701%2017.5554L18.8439%2017.6333L19.0484%2017.1771ZM21.4651%2018.2604L21.6696%2018.7167L22.6874%2018.2604L21.6696%2017.8042L21.4651%2018.2604ZM19.0484%2019.3438L18.8439%2018.8875L18.6701%2018.9654L18.5921%2019.1392L19.0484%2019.3438ZM10.9651%2019.2604L10.5093%2019.466L10.9651%2020.4762L11.4208%2019.466L10.9651%2019.2604ZM8.94423%2014.7812L9.39999%2014.5756L9.32222%2014.4033L9.14985%2014.3255L8.94423%2014.7812ZM4.46506%2012.7604L4.25944%2012.3047L3.24924%2012.7604L4.25944%2013.2162L4.46506%2012.7604ZM8.94423%2010.7396L9.14985%2011.1953L9.32222%2011.1176L9.39999%2010.9452L8.94423%2010.7396ZM10.9651%206.26042L11.4208%206.05479L10.9651%205.0446L10.5093%206.05479L10.9651%206.26042ZM12.9859%2010.7396L12.5301%2010.9452L12.6079%2011.1176L12.7803%2011.1953L12.9859%2010.7396ZM17.4651%2012.7604L17.6707%2013.2162L18.6809%2012.7604L17.6707%2012.3047L17.4651%2012.7604ZM12.9859%2014.7812L12.7803%2014.3255L12.6079%2014.4033L12.5301%2014.5756L12.9859%2014.7812ZM17.9651%2010.7604L18.4192%2010.5511L17.315%208.1553L16.8609%208.36458L16.4068%208.57386L17.511%2010.9697L17.9651%2010.7604ZM16.8609%208.36458L17.0669%207.90899L14.6711%206.82566L14.4651%207.28125L14.2591%207.73684L16.6549%208.82017L16.8609%208.36458ZM14.4651%207.28125L14.6743%207.73534L17.0702%206.63118L16.8609%206.17708L16.6516%205.72299L14.2558%206.82715L14.4651%207.28125ZM16.8609%206.17708L17.315%206.38636L18.4192%203.99053L17.9651%203.78125L17.511%203.57197L16.4068%205.9678L16.8609%206.17708ZM17.9651%203.78125L17.5095%203.98726L18.5928%206.38309L19.0484%206.17708L19.504%205.97108L18.4206%203.57524L17.9651%203.78125ZM19.0484%206.17708L18.8391%206.63118L21.2349%207.73534L21.4442%207.28125L21.6535%206.82715L19.2577%205.72299L19.0484%206.17708ZM21.4442%207.28125L21.2382%206.82566L18.8424%207.90899L19.0484%208.36458L19.2544%208.82017L21.6502%207.73684L21.4442%207.28125ZM19.0484%208.36458L18.5928%208.15858L17.5095%2010.5544L17.9651%2010.7604L18.4206%2010.9664L19.504%208.57059L19.0484%208.36458ZM17.9651%2021.7604L18.4213%2021.5559L17.338%2019.1392L16.8817%2019.3438L16.4255%2019.5483L17.5088%2021.9649L17.9651%2021.7604ZM16.8817%2019.3438L17.0863%2018.8875L14.6696%2017.8042L14.4651%2018.2604L14.2605%2018.7167L16.6772%2019.8L16.8817%2019.3438ZM14.4651%2018.2604L14.6696%2018.7167L17.0863%2017.6333L16.8817%2017.1771L16.6772%2016.7208L14.2605%2017.8042L14.4651%2018.2604ZM16.8817%2017.1771L17.338%2017.3816L18.4213%2014.9649L17.9651%2014.7604L17.5088%2014.5559L16.4255%2016.9726L16.8817%2017.1771ZM17.9651%2014.7604L17.5088%2014.9649L18.5921%2017.3816L19.0484%2017.1771L19.5046%2016.9726L18.4213%2014.5559L17.9651%2014.7604ZM19.0484%2017.1771L18.8439%2017.6333L21.2605%2018.7167L21.4651%2018.2604L21.6696%2017.8042L19.2529%2016.7208L19.0484%2017.1771ZM21.4651%2018.2604L21.2605%2017.8042L18.8439%2018.8875L19.0484%2019.3438L19.2529%2019.8L21.6696%2018.7167L21.4651%2018.2604ZM19.0484%2019.3438L18.5921%2019.1392L17.5088%2021.5559L17.9651%2021.7604L18.4213%2021.9649L19.5046%2019.5483L19.0484%2019.3438ZM10.9651%2019.2604L11.4208%2019.0548L9.39999%2014.5756L8.94423%2014.7812L8.48846%2014.9869L10.5093%2019.466L10.9651%2019.2604ZM8.94423%2014.7812L9.14985%2014.3255L4.67068%2012.3047L4.46506%2012.7604L4.25944%2013.2162L8.7386%2015.237L8.94423%2014.7812ZM4.46506%2012.7604L4.67068%2013.2162L9.14985%2011.1953L8.94423%2010.7396L8.7386%2010.2838L4.25944%2012.3047L4.46506%2012.7604ZM8.94423%2010.7396L9.39999%2010.9452L11.4208%206.46604L10.9651%206.26042L10.5093%206.05479L8.48846%2010.534L8.94423%2010.7396ZM10.9651%206.26042L10.5093%206.46604L12.5301%2010.9452L12.9859%2010.7396L13.4417%2010.534L11.4208%206.05479L10.9651%206.26042ZM12.9859%2010.7396L12.7803%2011.1953L17.2594%2013.2162L17.4651%2012.7604L17.6707%2012.3047L13.1915%2010.2838L12.9859%2010.7396ZM17.4651%2012.7604L17.2594%2012.3047L12.7803%2014.3255L12.9859%2014.7812L13.1915%2015.237L17.6707%2013.2162L17.4651%2012.7604ZM12.9859%2014.7812L12.5301%2014.5756L10.5093%2019.0548L10.9651%2019.2604L11.4208%2019.466L13.4417%2014.9869L12.9859%2014.7812Z%22%20fill%3D%22%23DDDDDD%22%20mask%3D%22url(%23path-2-inside-1_4816_19485)%22%2F%3E%0A%3C%2Fg%3E%0A%3Cdefs%3E%0A%3C%2Fdefs%3E%0A%3C%2Fsvg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  z-index: 200;
+}
+</style><script>
+(function() {
+  var selector = "img[src*=\"8DOdkBxKZPT9aMo-CpFkOV\"],[style*=\"8DOdkBxKZPT9aMo-CpFkOV\"],img[src*=\"8KexJAVYN7LezwJZ-s74qg\"],[style*=\"8KexJAVYN7LezwJZ-s74qg\"],img[src*=\"8UUOTn4KGwLavu5zfPvOyq\"],[style*=\"8UUOTn4KGwLavu5zfPvOyq\"],img[src*=\"8fpD7yZJVC27Ve75vWJ_6f\"],[style*=\"8fpD7yZJVC27Ve75vWJ_6f\"],img[src*=\"9SdS-Q9TL4jcvm5GS6H_SP\"],[style*=\"9SdS-Q9TL4jcvm5GS6H_SP\"],img[src*=\"9ZUxjquSumt5abHvo27OGy\"],[style*=\"9ZUxjquSumt5abHvo27OGy\"],img[src*=\"9zhopjU_MIt6sIEd6Eq4Nb\"],[style*=\"9zhopjU_MIt6sIEd6Eq4Nb\"],img[src*=\"a1msAqZJxGe3qqFR5Xa4sD\"],[style*=\"a1msAqZJxGe3qqFR5Xa4sD\"],img[src*=\"a_YSb2clNEvc3RGWI6_kad\"],[style*=\"a_YSb2clNEvc3RGWI6_kad\"],img[src*=\"bw4ClJCGfkT5b4cCIAnO9I\"],[style*=\"bw4ClJCGfkT5b4cCIAnO9I\"]";
+  if (!selector) return;
+  const targets = document.querySelectorAll(selector);
+  if (!targets.length) return;
+
+  const pairs = [];
+  targets.forEach(function(target) {
+    const badge = document.createElement('div');
+    badge.className = 'ai-image-badge';
+    document.body.appendChild(badge);
+    pairs.push({ target: target, badge: badge });
+  });
+
+  function position() {
+    const bodyRect = document.body.getBoundingClientRect();
+    const bodyTop = bodyRect.top + document.body.clientTop;
+    const bodyLeft = bodyRect.left + document.body.clientLeft;
+    pairs.forEach(function({target, badge}) {
+      const rect = target.getBoundingClientRect();
+      badge.style.top = (rect.bottom - bodyTop - 25 - 8) + 'px';
+      badge.style.left = (rect.right - bodyLeft - 25 - 8) + 'px';
+    });
+  }
+
+  new ResizeObserver(position).observe(document.body);
+  position();
+})();
+</script></body>
+</html>
